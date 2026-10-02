@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#211b1a"/><stop offset="1" stop-color="#6d4b38"/></linearGradient>
+<linearGradient id="road" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#111821"/><stop offset=".55" stop-color="#24323b"/><stop offset="1" stop-color="#090d12"/></linearGradient>
+<filter id="glow"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<rect width="1600" height="900" fill="url(#sky)"/><rect x="170" y="250" width="1260" height="440" rx="35" fill="#271f1c"/><circle cx="1110" cy="540" r="95" fill="#f08b45" opacity=".55"/><path d="M1050 540 h120" stroke="#ffd7a4" stroke-width="30"/>
+<path d="M0 680 C350 610 610 640 850 610 C1110 575 1320 590 1600 520 L1600 900 L0 900 Z" fill="#2f2924"/>
+<path d="M515 900 C620 760 710 670 805 605 C900 545 1005 530 1110 510 C1000 600 950 685 930 900 Z" fill="url(#road)" stroke="#e4a15c" stroke-opacity=".38" stroke-width="5"/>
+<path d="M750 660 C820 625 900 598 980 576" fill="none" stroke="#e4a15c" stroke-width="7" stroke-linecap="round" opacity=".5" filter="url(#glow)"/>
+<rect y="720" width="1600" height="180" fill="url(#shade)" opacity=".15"/>
+<text x="80" y="110" fill="#f3efe4" font-family="Georgia,serif" font-size="60" font-weight="700">THE MOUNTAIN FORGE</text>
+<text x="84" y="158" fill="#d3d8d1" font-family="Arial,sans-serif" font-size="24" letter-spacing="3">STEEL BEFORE THE PASS</text>
+</svg>

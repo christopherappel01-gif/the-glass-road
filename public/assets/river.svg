@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#243749"/><stop offset="1" stop-color="#7894a2"/></linearGradient>
+<linearGradient id="road" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#111821"/><stop offset=".55" stop-color="#24323b"/><stop offset="1" stop-color="#090d12"/></linearGradient>
+<filter id="glow"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<rect width="1600" height="900" fill="url(#sky)"/><path d="M0 610 C280 540 390 700 650 630 C900 560 1080 680 1600 560 L1600 760 C1140 820 900 700 620 790 C340 860 180 720 0 760Z" fill="#304f61" opacity=".8"/>
+<path d="M0 680 C350 610 610 640 850 610 C1110 575 1320 590 1600 520 L1600 900 L0 900 Z" fill="#30443b"/>
+<path d="M515 900 C620 760 710 670 805 605 C900 545 1005 530 1110 510 C1000 600 950 685 930 900 Z" fill="url(#road)" stroke="#7dd4d0" stroke-opacity=".38" stroke-width="5"/>
+<path d="M750 660 C820 625 900 598 980 576" fill="none" stroke="#7dd4d0" stroke-width="7" stroke-linecap="round" opacity=".5" filter="url(#glow)"/>
+<rect y="720" width="1600" height="180" fill="url(#shade)" opacity=".15"/>
+<text x="80" y="110" fill="#f3efe4" font-family="Georgia,serif" font-size="60" font-weight="700">RIVER TERN</text>
+<text x="84" y="158" fill="#d3d8d1" font-family="Arial,sans-serif" font-size="24" letter-spacing="3">THE LOWER ROAD</text>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#17203a"/><stop offset="1" stop-color="#756d88"/></linearGradient>
+<linearGradient id="road" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#111821"/><stop offset=".55" stop-color="#24323b"/><stop offset="1" stop-color="#090d12"/></linearGradient>
+<filter id="glow"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<rect width="1600" height="900" fill="url(#sky)"/><path d="M0 610 L300 420 L510 570 L790 300 L1080 590 L1320 400 L1600 560 L1600 900 L0 900Z" fill="#2b3340"/><g fill="#9bded4" opacity=".65"><rect x="1110" y="420" width="28" height="160"/><rect x="1180" y="390" width="30" height="190"/><rect x="1260" y="440" width="25" height="140"/><rect x="1340" y="360" width="35" height="220"/></g>
+<path d="M0 680 C350 610 610 640 850 610 C1110 575 1320 590 1600 520 L1600 900 L0 900 Z" fill="#24302e"/>
+<path d="M515 900 C620 760 710 670 805 605 C900 545 1005 530 1110 510 C1000 600 950 685 930 900 Z" fill="url(#road)" stroke="#94e7dc" stroke-opacity=".38" stroke-width="5"/>
+<path d="M750 660 C820 625 900 598 980 576" fill="none" stroke="#94e7dc" stroke-width="7" stroke-linecap="round" opacity=".5" filter="url(#glow)"/>
+<rect y="720" width="1600" height="180" fill="url(#shade)" opacity=".15"/>
+<text x="80" y="110" fill="#f3efe4" font-family="Georgia,serif" font-size="60" font-weight="700">BEYOND THE MAPS</text>
+<text x="84" y="158" fill="#d3d8d1" font-family="Arial,sans-serif" font-size="24" letter-spacing="3">SOMETHING ANSWERS</text>
+</svg>
