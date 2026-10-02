@@ -11,12 +11,13 @@ const classInfo = {
   Engineer:{icon:'⚙️',gift:'Improviser — gains +1 to Craft checks; invaluable with mechanisms, repairs and construction.',fav:['Craft','Knowledge','Strength'],build:{Strength:3,Agility:1,Endurance:2,Awareness:2,Survival:1,Stealth:0,Knowledge:4,Craft:5,Influence:1,Spirit:1}}
 };
 const sceneArt={"intro":["◈","Brackencliff After the Quake"],"briefing":["◈","The Expedition Table"],"forge":["◈","The Forge Before the Road"],"cliff_excavation":["◈","The First Exposed Mile"],"first_mile":["◈","The Road Under the Fields"],"farmstead":["◈","The Last Farm"],"woodland_edge":["◈","Where the Old Maps End"],"pine_road":["♣","Under the High Pines"],"charcoal_camp":["♣","The Charcoal Burner's Camp"],"stag_stones":["♣","The Stag Stones"],"pine_camp":["♣","Camp Above the Tern"],"pine_descent":["♣","The Long Descent"],"river_road":["≋","Along the River Tern"],"ferry_house":["≋","The Empty Ferry House"],"drowned_marker":["≋","The Drowned Marker"],"river_hamlet":["≋","Three Houses at Lowwater"],"river_camp":["≋","Rain at Lowwater"],"river_exit":["≋","The Flooded Approach"],"broken_span":["⚔","The Broken Span"],"span_wave1":["⚔","Glass Hounds"],"span_choice":["⚔","The Bridge Turns"],"span_final":["⚔","The Tone Beneath the Bridge"],"after_span":["⚔","Two Expeditions, One Road"],"hollowmere":["⌂","Hollowmere"],"hollow_forge":["⌂","The Mountain Forge"],"hollow_inn":["⌂","The Lantern Inn"],"hollow_records":["⌂","The Toll-House Archive"],"mountain_departure":["▲","Leaving Hollowmere"],"ridge1":["▲","The Wind Stair"],"ridge2":["▲","The Bell Cairn"],"ridge3":["▲","The White Ledge"],"tunnel1":["▲","The Maintenance Door"],"tunnel2":["▲","The Water Galleries"],"tunnel3":["▲","The Closed Chamber"],"pass_reunion":["▲","The First Crossing"],"final_view":["✧","Beyond the Known Maps"]};
-const sceneImages={"intro":"assets/brackencliff.svg","briefing":"assets/brackencliff.svg","forge":"assets/forge.svg","cliff_excavation":"assets/brackencliff.svg","first_mile":"assets/brackencliff.svg","farmstead":"assets/brackencliff.svg","woodland_edge":"assets/greywood.svg","pine_road":"assets/greywood.svg","charcoal_camp":"assets/greywood.svg","stag_stones":"assets/greywood.svg","pine_camp":"assets/greywood.svg","pine_descent":"assets/greywood.svg","river_road":"assets/river.svg","ferry_house":"assets/river.svg","drowned_marker":"assets/river.svg","river_hamlet":"assets/river.svg","river_camp":"assets/river.svg","river_exit":"assets/river.svg","broken_span":"assets/span.svg","span_wave1":"assets/span.svg","span_choice":"assets/span.svg","span_final":"assets/span.svg","after_span":"assets/span.svg","hollowmere":"assets/hollowmere.svg","hollow_forge":"assets/forge.svg","hollow_inn":"assets/hollowmere.svg","hollow_records":"assets/hollowmere.svg","mountain_departure":"assets/mountain.svg","ridge1":"assets/mountain.svg","ridge2":"assets/mountain.svg","ridge3":"assets/mountain.svg","tunnel1":"assets/mountain.svg","tunnel2":"assets/mountain.svg","tunnel3":"assets/mountain.svg","pass_reunion":"assets/mountain.svg","final_view":"assets/final.svg"};
+const sceneImages={"intro":"assets/brackencliff_ai.jpg","briefing":"assets/brackencliff_ai.jpg","forge":"assets/brackencliff_ai.jpg","cliff_excavation":"assets/brackencliff_ai.jpg","first_mile":"assets/first_mile_ai.jpg","farmstead":"assets/first_mile_ai.jpg","woodland_edge":"assets/greywood_ai.jpg","pine_road":"assets/greywood_ai.jpg","charcoal_camp":"assets/greywood_ai.jpg","stag_stones":"assets/greywood_ai.jpg","pine_camp":"assets/greywood_ai.jpg","pine_descent":"assets/greywood_ai.jpg","river_road":"assets/river_ai.jpg","ferry_house":"assets/river_ai.jpg","drowned_marker":"assets/river_ai.jpg","river_hamlet":"assets/river_ai.jpg","river_camp":"assets/river_ai.jpg","river_exit":"assets/river_ai.jpg","broken_span":"assets/span_ai.jpg","span_wave1":"assets/span_ai.jpg","span_choice":"assets/span_ai.jpg","span_final":"assets/span_ai.jpg","after_span":"assets/span_ai.jpg","hollowmere":"assets/hollowmere_ai.jpg","hollow_forge":"assets/hollowmere_ai.jpg","hollow_inn":"assets/hollowmere_ai.jpg","hollow_records":"assets/hollowmere_ai.jpg","mountain_departure":"assets/mountain_ai.jpg","ridge1":"assets/mountain_ai.jpg","ridge2":"assets/mountain_ai.jpg","ridge3":"assets/mountain_ai.jpg","tunnel1":"assets/mountain_ai.jpg","tunnel2":"assets/mountain_ai.jpg","tunnel3":"assets/mountain_ai.jpg","pass_reunion":"assets/mountain_ai.jpg","final_view":"assets/final_ai.jpg"};
 const portraitImages={Knight:['assets/knight_1.jpg','assets/knight_2.jpg','assets/knight_3.jpg'],Ranger:['assets/ranger_1.jpg','assets/ranger_2.jpg','assets/ranger_3.jpg'],Thief:['assets/thief_1.jpg','assets/thief_2.jpg','assets/thief_3.jpg'],Mage:['assets/mage_1.jpg','assets/mage_2.jpg','assets/mage_3.jpg'],Monk:['assets/monk_1.jpg','assets/monk_2.jpg','assets/monk_3.jpg'],Engineer:['assets/engineer_1.jpg','assets/engineer_2.jpg','assets/engineer_3.jpg']};
 const portraitChoice={create:1,join:1};
 const portraitPath=(cls,n=1)=>portraitImages[cls]?.[Math.max(0,Math.min(2,Number(n||1)-1))]||portraitImages[cls]?.[0]||'assets/portraits.jpg';
-const npcInfo={"Mara":{"name":"Mara Vale","img":"assets/npc_mara.svg","tag":"Cartographer"},"Dain":{"name":"Dain Holt","img":"assets/npc_dain.svg","tag":"Road-captain"},"Ilyra":{"name":"Ilyra Sen","img":"assets/npc_ilyra.svg","tag":"Interpreter"},"Rook":{"name":"Cassian Rook","img":"assets/npc_rook.svg","tag":"Rival explorer"},"Rowan":{"name":"Rowan Marr","img":"assets/npc_rowan.svg","tag":"Brackencliff blacksmith"},"Sella":{"name":"Master Sella Vorr","img":"assets/npc_sella.svg","tag":"Hollowmere smith"}};
+const npcInfo={"Mara":{"name":"Mara Vale","img":"assets/npc_mara_ai.jpg","tag":"Cartographer"},"Dain":{"name":"Dain Holt","img":"assets/npc_dain_ai.jpg","tag":"Road-captain"},"Ilyra":{"name":"Ilyra Sen","img":"assets/npc_ilyra_ai.jpg","tag":"Interpreter"},"Rook":{"name":"Cassian Rook","img":"assets/npc_rook_ai.jpg","tag":"Rival explorer"},"Rowan":{"name":"Rowan Marr","img":"assets/npc_rowan_ai.jpg","tag":"Brackencliff blacksmith"},"Sella":{"name":"Master Sella Vorr","img":"assets/npc_sella_ai.jpg","tag":"Hollowmere smith"}};
 let me=null,state=null,myStats=emptyStats(),roomCode='';
+let rollRequest=null;
 let audioOn=true,ambientOn=readJson('glassRoadAmbient')!==false,lastSceneSeen=null,lastRollSeen='',dismissedRollKey='',previousSnapshot=null,suppressNextSceneReveal=false,pendingStoryBridge=null;
 let ambientScene=null,ambientMaster=null,ambientNodes=[],ambientTimer=null;
 let voiceJoined=false,voiceMuted=false,localVoiceStream=null,voiceAnalyserFrame=null,localSpeaking=false;
@@ -39,6 +40,47 @@ function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt
 function show(id){['home','lobby','game','ended'].forEach(x=>$(x).classList.toggle('hidden',x!==id));}
 function showError(msg){const e=$('homeError');e.textContent=msg;e.classList.remove('hidden');clearTimeout(showError.t);showError.t=setTimeout(()=>e.classList.add('hidden'),4500);if(state&&state.phase!=='lobby'&&$('consequenceToast'))showConsequence('Something needs attention',msg,'bad');}
 function used(){return skills.reduce((a,s)=>a+Number(myStats[s]||0),0);}
+function clearRollRequest(){
+  if(rollRequest?.timer)clearTimeout(rollRequest.timer);
+  if(rollRequest?.followup)clearTimeout(rollRequest.followup);
+  rollRequest=null;
+}
+function sendChallengeRoll(payload,button){
+  if(!state?.pending)return showError('That challenge is no longer active.');
+  if(rollRequest)return;
+  const challengeId=state.pending.challengeId||null;
+  const original=button?.textContent||'🎲 Roll the Dice';
+  if(button){button.disabled=true;button.textContent='🎲 Rolling…';}
+  let finished=false;
+  const recover=(message)=>{
+    if(finished)return;
+    finished=true;
+    if(rollRequest?.timer)clearTimeout(rollRequest.timer);
+    rollRequest=null;
+    if(button){button.disabled=false;button.textContent='🎲 Retry Roll';}
+    showConsequence('Roll did not resolve',message||'The server did not confirm the roll. Your turn is still safe — try the roll again.','bad');
+  };
+  const timer=setTimeout(()=>recover('No response arrived from the server. Your challenge has not been skipped or failed; press Retry Roll.'),6500);
+  rollRequest={challengeId,timer,button,original};
+  socket.emit('rollChallenge',{...payload,challengeId},ack=>{
+    if(finished)return;
+    if(!ack?.ok){
+      clearTimeout(timer);finished=true;rollRequest=null;
+      if(button){button.disabled=false;button.textContent='🎲 Retry Roll';}
+      showError(ack?.message||'The roll could not be resolved. Please try again.');
+      return;
+    }
+    if(button)button.textContent='🎲 Resolving…';
+    rollRequest.followup=setTimeout(()=>{
+      if(rollRequest&&state?.pending?.challengeId===challengeId&&!state?.pending?.failed){
+        const b=rollRequest.button;clearRollRequest();
+        if(b){b.disabled=false;b.textContent='🎲 Retry Roll';}
+        showConsequence('Roll received, scene still waiting','The server received the roll but the scene did not advance. Retry once; duplicate requests are safely rejected.','bad');
+      }
+    },3000);
+  });
+}
+
 function player(){return state?.players.find(p=>p.id===me);}
 function emitJoin(mode){const name=$(mode+'Name').value.trim(), cls=$(mode+'Class').value, background=$(mode+'Background').value,portrait=portraitChoice[mode]||1;if(!name)return showError('Enter a hero name first.');if(mode==='join'){const code=$('joinCode').value.trim().toUpperCase();if(code.length!==5)return showError('Enter the five-letter room code.');socket.emit('joinRoom',{roomCode:code,name,cls,background,portrait});}else socket.emit('createRoom',{name,cls,background,portrait});}
 function refreshSavedCampaignUI(){
@@ -122,7 +164,13 @@ socket.on('resumed',x=>{acceptIdentity(x,false);setTimeout(()=>{if(state?.phase=
 socket.on('campaignSave',x=>{campaignSave=x;writeJson('glassRoadCampaign',x);refreshSavedCampaignUI();if($('saveStatus'))$('saveStatus').textContent=`✓ Auto-saved · ${new Date(x.updatedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;});
 socket.on('secret',x=>{const box=$('secret');box.innerHTML=`<b>🔒 Private ${esc(x.title||'insight')}</b><br>${esc(x.text)}<div class="small muted" style="margin-top:6px">Only your character receives this clue. It has been saved in your Hero sheet.</div>`;box.classList.remove('hidden');const key=`${x.title||'insight'}|${x.text}`;if(!privateClues.some(c=>c.key===key)){privateClues.unshift({key,title:x.title||'Private insight',text:x.text,seenAt:Date.now()});privateClues=privateClues.slice(0,20);savePrivateClues();}clearTimeout(socket._secretTimer);socket._secretTimer=setTimeout(()=>box.classList.add('hidden'),16000);if($('heroSheetModal')&&!$('heroSheetModal').classList.contains('hidden'))renderHeroSheet();});
 socket.on('state',s=>{
-  const old=state; state=s;roomCode=s.code||roomCode;
+  const old=state;
+  if(rollRequest){
+    const currentId=rollRequest.challengeId;
+    const incomingId=s.pending?.challengeId||null;
+    if(!s.pending||s.pending.failed||incomingId!==currentId)clearRollRequest();
+  }
+  state=s;roomCode=s.code||roomCode;
   if(!me)return;
   const p=s.players.find(x=>x.id===me);if(p?.ready&&used()===0)myStats={...p.stats};
   if(old) handleAtmosphere(old,s);
@@ -396,7 +444,7 @@ function renderChallenge(mine){
       const update=()=>{const hero=groupHeroes.find(x=>x.id===h.value)||groupHeroes[0];s.innerHTML=skillOptions(allowed[0],allowed,hero);stats.textContent=`Relevant skills: ${relevantSkillSummary(hero,allowed)}`;};
       h.onchange=update;
     });
-    $('teamRoll').onclick=()=>{const hs=[...document.querySelectorAll('.teamHero')],ss=[...document.querySelectorAll('.teamSkill')];const team=hs.map((h,i)=>({playerId:h.value,skill:ss[i].value}));socket.emit('rollChallenge',{team});};return;
+    $('teamRoll').onclick=()=>{const hs=[...document.querySelectorAll('.teamHero')],ss=[...document.querySelectorAll('.teamSkill')];const team=hs.map((h,i)=>({playerId:h.value,skill:ss[i].value}));sendChallengeRoll({team},$('teamRoll'));};return;
   }
   const supportEligible=groupHeroes.filter(x=>x.id!==me&&x.supportReady);const support=p.type==='support',meHero=player();const seasonedNote=Number(meHero?.stats?.[p.recommended]||0)>=6?`<div class="knowledge-help">✦ Seasoned: ${esc(p.recommended)} has become one of ${esc(meHero.name)}’s defining strengths. Choosing it rolls with Advantage.</div>`:'';
   const helperOptions=supportEligible.map(x=>`<option value="${x.id}">${esc(x.name)} — ${x.cls} · ${esc(relevantSkillSummary(x,p.supportSkills))}</option>`).join('');
@@ -408,7 +456,7 @@ function renderChallenge(mine){
     box.innerHTML=`<div class="challenge-box"><span class="mode">${support?'SUPPORT AVAILABLE':'SOLO CHALLENGE'}</span><h3>${esc(p.desc)}</h3>${p.reason?`<div class="challenge-explain">${esc(p.reason)}</div>`:''}${seasonedNote}<p><b>Target:</b> ${p.effectiveDifficulty||p.difficulty} (${difficultyName(p.effectiveDifficulty||p.difficulty)}). <b>Use:</b> ${(p.allowedSkills||[p.recommended]).join(' or ')}.${support?` A helper may Support; their roll needs <b>${p.supportTarget||6}</b>+ to add +2.`:''}${p.knowledgeNote?` <span class="knowledge-help">📖 ${esc(p.knowledgeNote)}</span>`:''}${(p.effectiveDifficulty||p.difficulty)>p.difficulty?' <span class="threat-warning">Threat has made this challenge harder.</span>':''}</p><div class="form-grid"><label>Your skill<select id="mainSkill">${skillOptions(p.recommended,p.allowedSkills,meHero)}</select></label>${support?`<label>Optional helper<select id="supportPlayer"><option value="">Roll alone</option>${helperOptions}</select></label>`:''}</div>${support?`<div id="supportSkillWrap" class="hidden"><label>Helper's skill<select id="supportSkill"></select></label><p id="supportSkillHint" class="small muted">Choose a helper to see their relevant skill ratings.</p></div>`:''}<button id="mainRoll" class="btn btn-primary full">🎲 Roll the Dice</button></div>`;
   }
   if(support&&$('supportPlayer'))$('supportPlayer').onchange=()=>{const id=$('supportPlayer').value,wrap=$('supportSkillWrap');wrap.classList.toggle('hidden',!id);if(id){const h=groupHeroes.find(x=>x.id===id);$('supportSkill').innerHTML=skillOptions((p.supportSkills||[])[0],p.supportSkills,h);$('supportSkillHint').textContent=`${h.name}: ${relevantSkillSummary(h,p.supportSkills)}. A total of ${p.supportTarget||6}+ adds +2 to the main roll.`;}};
-  $('mainRoll').onclick=()=>socket.emit('rollChallenge',{skill:$('mainSkill').value,supportPlayerId:support&&$('supportPlayer').value||null,supportSkill:support&&$('supportSkill')?.value||null});
+  $('mainRoll').onclick=()=>sendChallengeRoll({skill:$('mainSkill').value,supportPlayerId:support&&$('supportPlayer').value||null,supportSkill:support&&$('supportSkill')?.value||null},$('mainRoll'));
 }
 function renderLastRoll(){
   const r=state.lastRoll;if(!r){$('rollResult').innerHTML='';return;}
@@ -434,7 +482,7 @@ function renderEnding(){
   show('ended');
   document.querySelector('#ended .eyebrow').textContent='THE GLASS ROAD — FIRST CROSSING COMPLETE';
   document.querySelector('#ended h1').textContent='Beyond the Known Maps';
-  $('endingArt').style.backgroundImage="linear-gradient(0deg,rgba(5,10,18,.72),rgba(5,10,18,.08)),url('assets/final.svg')";
+  $('endingArt').style.backgroundImage="linear-gradient(0deg,rgba(5,10,18,.72),rgba(5,10,18,.08)),url('assets/final_ai.jpg')";
   const choices={
     truth:'The company returns to Hollowmere determined to report exactly what lies beyond Crown Pass: an active Road, a distant lit city, and a system nobody yet understands. Discovery will be public — and so will the warning.',
     secret:'The company returns with evidence that the Road is active but keeps the distant city out of the first report. The choice buys time to understand what is awake before kings, investors and armies arrive.',
