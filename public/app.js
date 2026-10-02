@@ -228,6 +228,29 @@ function finaleCallbackCards(){const a=state.allies||{},f=state.flags||{},items=
   return cards.slice(0,6);
 }
 function renderFinaleCallbacks(scene){const box=$('callbackPanel');if(!box)return;const finale=['pass_reunion','final_view'];if(!finale.includes(scene)){box.classList.add('hidden');box.innerHTML='';return;}const cards=finaleCallbackCards();if(!cards.length){box.classList.add('hidden');return;}box.innerHTML=`<div class="eyebrow">THE JOURNEY REMEMBERS</div><div class="callback-grid">${cards.map(c=>`<div class="callback-card"><span>${c[0]}</span><div><b>${esc(c[1])}</b><p>${esc(c[2])}</p></div></div>`).join('')}</div>`;box.classList.remove('hidden');}
+function openingHeroDescription(p){
+  const cls=p?.cls||'Adventurer', bg=p?.background||'Outlander';
+  const stats=Object.entries(p?.stats||{}).sort((a,b)=>b[1]-a[1]);
+  const first=stats[0]?.[0]||'instinct', second=stats[1]?.[0]||'nerve';
+  const classLine={
+    Knight:'A steady protector who tends to put themselves between danger and the rest of the company.',
+    Ranger:'A watchful traveller who reads terrain, tracks and changing weather before most people notice them.',
+    Thief:'A quick, observant problem-solver who notices openings, hidden routes and motives others miss.',
+    Mage:'A patient student of patterns and old powers, drawn to questions that do not yet have sensible answers.',
+    Monk:'A calm presence with a strong instinct for people, fear and the unseen weight carried into a journey.',
+    Engineer:'A practical thinker who looks at strange mechanisms and immediately wonders how they were built.'
+  }[cls]||'An experienced traveller bringing a different way of seeing the road.';
+  const bgLine={
+    Noble:'Their upbringing taught them to read status, obligation and the consequences of public choices.',
+    Outlander:'They are comfortable beyond settled roads and trust hard-won instinct over tidy maps.',
+    Scholar:'They have learned to look for what old records omit as carefully as what they preserve.',
+    Sailor:'Weather, distance and the behaviour of a travelling company are second nature to them.',
+    Streetwise:'They know that people reveal themselves through small bargains, silences and who controls the exits.',
+    Artisan:'They notice workmanship, wear and practical details that other travellers overlook.'
+  }[bg]||'They bring experience that does not fit neatly onto Mara’s maps.';
+  return `${classLine} ${bgLine} Their strongest abilities are ${first} ${stats[0]?.[1]??0} and ${second} ${stats[1]?.[1]??0}.`;
+}
+
 function openingCompanyHtml(){
   const people=(state?.players||[]);
   if(!people.length)return '';
