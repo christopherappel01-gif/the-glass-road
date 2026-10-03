@@ -38,3 +38,19 @@ This build keeps the slower opening pace and adds:
 - retained V1.1 challenge-token/acknowledgement retry protection for stuck rolls
 
 Render settings remain: Node runtime, `npm install`, `npm start`, health check `/health`.
+
+
+## V1.3 Keeper Finale
+
+This build adds:
+- a new two-stage final battle across the Receiving Span
+- a final keeper chamber where sacrifice is a real, optional choice
+- player self-sacrifice, Mara sacrifice, Dain sacrifice, refusal, and Road-severing endings
+- a turn-passing option so any hero can volunteer rather than the game assigning the sacrifice
+- an earned hidden solution that can save everyone if the party has connected enough earlier Road clues
+- a dangerous improvised alternative for parties that did not fully solve the mystery
+- memorial epilogues for sacrificed heroes and NPCs
+- new finale illustration assets for the receiver battle and keeper chamber
+- battle-state UI for the Receiving Span
+
+The sacrifice is never mandatory: the party can refuse, sever the receiver, or potentially discover another way.

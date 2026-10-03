@@ -183,6 +183,10 @@ function checkConclusions(room){
     room.flags.road_listens=true;
     journalPush(j.conclusions,{id:'road_listens',title:'The Road receives and answers instructions',text:'The milestones, guardians and maintenance doors all behave like parts of a system that listens for structured signals and responds.'});
   }
+  if(room.flags.road_infrastructure&&room.flags.road_listens&&(room.flags.pulse_timed||room.flags.bell_pattern||hasItem(room,'sealed_token'))&&!room.flags.keeper_solution){
+    room.flags.keeper_solution=true;
+    journalPush(j.conclusions,{id:'keeper_solution',title:'A keeper may be transferable, not permanent',text:'The timed pulses, responsive controls and station handoff language imply the Road needs continuity of control — not necessarily one person trapped forever.'});
+  }
 }
 function narrativeDifficulty(room,cfg,base){let n=Number(base||0),note=null;if(cfg.knowledgeFlag&&room.flags[cfg.knowledgeFlag]){n=Math.max(5,n-1);note=cfg.knowledgeNote||'Earlier information gives the company an advantage here.';}if(cfg.knowledgeItem&&hasItem(room,cfg.knowledgeItem)){n=Math.max(5,n-1);note=cfg.knowledgeItemNote||`Something the company carried here makes this easier.`;}return {value:n,note};}
 function outcomePayload(room,cfg,result,nextScene,detail={},group=activeGroup(room)){
@@ -260,6 +264,8 @@ function effect(room,cfg,success=true){
   if(fx.item)addItem(room,fx.item);
   if(fx.items)fx.items.forEach(id=>addItem(room,id));
   if(fx.consume)consumeItem(room,fx.consume);
+  if(fx.sacrificeActive){const p=activePlayer(room);if(p){p.sacrificed=true;p.sacrificeReason='keeper';room.flags.sacrificedHeroId=p.id;room.flags.sacrificedHeroName=p.name;}}
+  if(fx.npcSacrifice)room.flags['sacrificedNpc_'+fx.npcSacrifice]=true;
   if(fx.gearUpgrade){
     const p=activePlayer(room); if(p){
       p.gearUpgrades=p.gearUpgrades||{attack:0,defense:0,serviceUses:0,labels:[]};
@@ -272,6 +278,7 @@ function effect(room,cfg,success=true){
       addLog(room,`${p.name}'s ${p.gear} was upgraded.`);
     }
   }
+  checkConclusions(room);
 }
 function recordScene(room,group,scene){if(!group||!scene)return;group.trail=Array.isArray(group.trail)?group.trail:[];if(group.trail[group.trail.length-1]!==scene)group.trail.push(scene);ensureMapVisited(room,scene);}
 function tryMerge(room,splitSet){const gs=(room.groups||[]).filter(g=>g.splitSet===splitSet);if(gs.length<2||!gs.every(g=>g.waitingMerge))return false;const target=gs[0].waitingMerge.target,key=gs[0].waitingMerge.key;if(!gs.every(g=>g.waitingMerge.key===key))return false;const ids=[...new Set(gs.flatMap(g=>g.playerIds))];room.routeHistory=room.routeHistory||[];for(const g of gs)room.routeHistory.push({id:g.id,name:g.name,playerIds:[...g.playerIds],trail:[...g.trail],complete:true});const merged={id:'group_'+crypto.randomBytes(3).toString('hex'),name:'Company',playerIds:ids,scene:target,pending:null,lastRoll:null,trail:[target],splitSet:null,waitingMerge:null};room.groups=room.groups.filter(g=>g.splitSet!==splitSet);room.groups.push(merged);for(const id of ids){const p=getPlayer(room,id);if(p)p.groupId=merged.id;}recordScene(room,merged,target);emitContextClues(room,target,ids);addLog(room,`The separated groups reunited at ${target.replaceAll('_',' ')}.`);return true;}
@@ -303,6 +310,34 @@ actionMap.ridge2.read.knowledgeItem='marker_rubbing';
 actionMap.ridge2.read.knowledgeItemNote='The Drowned Marker Rubbing provides a second version of the same symbolic grammar.';
 actionMap.tunnel1.study.knowledgeItem='road_shard';
 actionMap.tunnel1.study.knowledgeItemNote='The Warm Road Shard reacts near the maintenance mark, revealing which groove is active.';
+
+
+// V1.3 finale: final battle, keeper choice, sacrifice and earned no-sacrifice solution.
+Object.assign(actionMap,{
+  final_view:{
+    study:{type:'solo',lowStakes:true,desc:'read the seven-tower answering sequence',difficulty:6,recommended:'Knowledge',success:'receiver_threshold',failure:'receiver_threshold',effects:{flag:'final_sequence'},dialogueSuccess:{speaker:'Ilyra Sen',text:'The towers are not greeting us. They are negotiating a handoff — asking which station will carry the crossing next.',clue:{id:'handoff_sequence',title:'The distant towers are negotiating a handoff',text:'The seven-tower pattern is a technical exchange between stations preparing to transfer an active crossing.'}}},
+    signal:{type:'support',desc:'answer the distant city using the Bell Cairn pattern',difficulty:7,recommended:'Knowledge',success:'receiver_threshold',failure:'receiver_threshold',effects:{flag:'receiver_handshake'},dialogueSuccess:{speaker:'Mara Vale',text:'It heard us. And for the first time, something out there has answered in the same sequence we sent.',clue:{id:'receiving_answer',title:'The far station answered your signal',text:'The company successfully used the mountain bell pattern to establish a two-way response with the eastern receiver.'}}},
+    advance:{type:'instant',desc:'advance carefully toward the receiving station',success:'receiver_threshold'}
+  },
+  receiver_threshold:{
+    hold:{type:'team',desc:'hold the Road wardens while the company crosses',memberDifficulty:7,need:2,teamSize:3,success:'receiver_assault',failure:'receiver_assault',dangerous:true,effects:{flag:'receiver_line'},outcomeText:'hold a shrinking line against the Road wardens long enough for the company to reach the far half of the span'},
+    redirect:{type:'support',desc:'redirect the Road signal and disrupt the wardens',difficulty:8,recommended:'Craft',success:'receiver_assault',failure:'receiver_assault',dangerous:true,knowledgeFlag:'road_listens',knowledgeNote:'Because you already proved the Road listens to structured signals, the wardens command pattern is easier to interrupt.',effects:{flag:'receiver_redirect'},dialogueSuccess:{speaker:'Ilyra Sen',text:'Again — seven, pause, three. They are not angry. They are obeying the wrong instruction. Change the instruction.',clue:{id:'warden_command',title:'The final wardens are controlled by the receiver',text:'The receiving span guardians respond directly to station control signals.'}}}
+  },
+  receiver_assault:{
+    push:{type:'team',desc:'make the final push through the receiver wardens',memberDifficulty:8,need:2,teamSize:3,success:'keeper_choice',failure:'keeper_choice',dangerous:true,effects:{flag:'receiver_open'},outcomeText:'break through the last Road wardens and reach the receiver before the span folds away'},
+    control:{type:'support',desc:'force the receiver control seams to hold open',difficulty:8,recommended:'Craft',success:'keeper_choice',failure:'keeper_choice',dangerous:true,knowledgeFlag:'road_infrastructure',knowledgeNote:'The mountain galleries taught you how the Road separates control channels from the travelling surface.',effects:{flag:'receiver_open'},outcomeText:'hold the receiver tower open long enough for the whole company to enter'}
+  },
+  keeper_choice:{
+    hero:{type:'instant',desc:'volunteer to become the keeper so the others can escape',success:'@final:hero_sacrifice',effects:{finalChoice:'hero_sacrifice',sacrificeActive:true,flag:'keeper_paid'},dialogueSuccess:{speaker:'Mara Vale',text:'No map is worth this. But if you are choosing it — truly choosing it — then I will make sure nobody tells the story as though the Road took you. You gave us the crossing.',decision:{id:'hero_sacrifice',title:'A hero chose to hold the Road',text:'One member of the company voluntarily remained at the receiver so everyone else could survive the crossing.'}}},
+    pass:{type:'instant',desc:'ask whether another hero will volunteer',success:'keeper_choice',effects:{flag:'keeper_decision_passed'},dialogueSuccess:{speaker:'Dain Holt',text:'Then say it plainly. No orders. No guilt. If somebody stays, it has to be their choice.',decision:{id:'keeper_passed',title:'The company refused to assign the sacrifice',text:'Rather than nominate someone, the active hero passed the decision so another companion could volunteer freely.'}}},
+    mara:{type:'instant',desc:'accept Mara Vale offer to remain as keeper',success:'@final:mara_sacrifice',effects:{finalChoice:'mara_sacrifice',npcSacrifice:'mara',flag:'keeper_paid'},dialogueSuccess:{speaker:'Mara Vale',text:'Then take the maps. All of them. And when people ask where the Road goes, tell them the first honest answer is not east. It is through people.',decision:{id:'mara_sacrifice',title:'Mara Vale became the keeper',text:'The expedition accepted Mara offer to remain behind and keep the receiver stable while the others escaped.'}}},
+    dain:{type:'instant',desc:'let Dain Holt take Mara place',success:'@final:dain_sacrifice',effects:{finalChoice:'dain_sacrifice',npcSacrifice:'dain',flag:'keeper_paid'},dialogueSuccess:{speaker:'Dain Holt',text:'Good. No speeches. A road-captain gets people home. You lot have got a very long road ahead of you.',decision:{id:'dain_sacrifice',title:'Dain Holt became the keeper',text:'Dain took the keeper platform so Mara and the company could return with what they had learned.'}}},
+    rewrite:{type:'instant',desc:'rewrite the Road handoff using everything the company learned',success:'@final:everyone_lives',requiresFlag:'keeper_solution',effects:{finalChoice:'everyone_lives',flag:'keeper_rewritten',hope:1},dialogueSuccess:{speaker:'Ilyra Sen',text:'There. It never says one keeper forever. It says one keeper at a time. Pass the signal. Pass it again. We can walk it out together.',decision:{id:'keeper_rewritten',title:'The company rewrote the handoff',text:'Because earlier clues revealed how the Road synchronizes between stations, the company transferred the keeper role without sacrificing anyone.'}}},
+    improvise:{type:'support',desc:'force a new handoff pattern without complete instructions',difficulty:9,recommended:'Craft',success:'@final:everyone_lives',failure:'keeper_choice',dangerous:true,knowledgeFlag:'final_sequence',knowledgeNote:'Reading the tower sequence gives you one piece of the handoff logic.',effects:{finalChoice:'everyone_lives',flag:'keeper_improvised'},outcomeText:'force the receiver to transfer the keeper role between living travellers instead of sealing around one person',failureText:'The new sequence almost catches, then collapses. The chamber gives you one more chance to choose before the span fails completely.'},
+    sever:{type:'instant',desc:'destroy the receiver rather than feed it a life',success:'@final:severed',effects:{finalChoice:'severed',flag:'receiver_destroyed'},dialogueSuccess:{speaker:'Mara Vale',text:'Do it. A road is not sacred because it is old. If its price is a person, we are allowed to say no.',decision:{id:'receiver_severed',title:'The company severed the Road',text:'Rather than sacrifice anyone, the expedition destroyed the active receiver and ended the crossing.'}}},
+    retreat:{type:'instant',desc:'refuse the sacrifice and retreat from the receiver',success:'@final:retreat',effects:{finalChoice:'retreat',flag:'keeper_refused'},dialogueSuccess:{speaker:'Dain Holt',text:'Then we leave. Failure is not the same thing as cowardice. Nobody here becomes a payment because an ancient machine says so.',decision:{id:'keeper_refused',title:'The company refused the sacrifice',text:'The expedition abandoned the active crossing rather than leave a living keeper behind.'}}}
+  }
+});
 
 io.on('connection', socket => {
   socket.on('createRoom', ({name,cls,background,portrait}) => {name=cleanName(name);if(!name||!classes.includes(cls))return socket.emit('errorMsg','Enter a hero name and class.');const room=newRoom(null);const p=newPlayer(socket,name,cls,room,background,portrait);room.hostId=p.id;room.players.push(p);rooms.set(room.code,room);attachSocket(room,p,socket);sendJoined(socket,room,p);emitRoom(room);});
@@ -363,6 +398,7 @@ io.on('connection', socket => {
   socket.on('intervene',()=>{const room=rooms.get(socket.data.roomCode),group=room&&activeGroup(room);if(!room||!group?.pending?.failed)return;const p=socketPlayer(room,socket);if(!p||!group.playerIds.includes(p.id)||!p.interventionReady||!group.pending.eligibleInterveners.includes(p.id))return;const skill={Knight:'Strength',Ranger:'Awareness',Thief:'Stealth',Mage:'Spirit',Monk:'Spirit',Engineer:'Craft'}[p.cls],die=rollD6(),total=die+skillBonus(p,skill,group.pending,false),ok=total>=(p.talent==='Healer'?6:7);p.interventionReady=false;awardGrowth(room,p,1,'a Heroic Intervention');group.lastRoll={type:'intervention',name:p.name,skill,die,total,success:ok};const cfg=group.pending;if(ok){effect(room,cfg,true);applyNarrativeMeta(room,cfg,true,p);emitOutcome(room,outcomePayload(room,cfg,'partial',cfg.success,{heroicMoment:false,complication:false},group),group);transition(room,cfg.success,group);nextTurn(room);emitRoom(room);}else{const active=activePlayer(room),remaining=groupPlayers(room,group).filter(x=>x.id!==active?.id&&x.interventionReady&&cfg.eligibleInterveners.includes(x.id));if(!remaining.length){resolveFailure(room,cfg,group);emitRoom(room);}else emitRoom(room);}});
   socket.on('declineIntervention',()=>{const room=rooms.get(socket.data.roomCode),group=room&&activeGroup(room);if(!room||!group?.pending?.failed)return;const active=activePlayer(room);if(!active||active.id!==socket.data.playerId)return;resolveFailure(room,group.pending,group);emitRoom(room);});
   socket.on('disconnect',()=>{const room=rooms.get(socket.data.roomCode);if(!room)return;const p=socketPlayer(room,socket);if(p&&p.socketId===socket.id){p.connected=false;p.voiceJoined=false;p.voiceMuted=false;p.voiceSpeaking=false;p.socketId=null;}emitRoom(room);if(!room.players.some(x=>x.connected))setTimeout(()=>{if(rooms.get(room.code)===room&&!room.players.some(x=>x.connected))rooms.delete(room.code);},4*60*60*1000);});
+  checkConclusions(room);
 });
 
 server.listen(PORT, () => console.log(`Glass Road RPG listening on ${PORT}`));

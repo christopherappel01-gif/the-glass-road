@@ -221,7 +221,39 @@ scenes.hollowmere.choices.push(["depart","Leave Hollowmere for Crown Pass","Cont
 scenes.forge.choices.splice(3,0,["repair","Repair damaged equipment","1 Coin · restore full condition","coin",1]);
 scenes.hollow_forge.choices.splice(3,0,["repair","Repair road-worn equipment","1 Coin · restore full condition","coin",1],["roadsteel","Bind the Glass Hound core into your equipment","4 Coin · unique +1 against Road constructs","item","glass_core"]);
 
-const worldMapConfig={"title":"The Glass Road — First Crossing","baseSvg":"<path class=\"map-road\" d=\"M7,66 C18,60 27,54 37,48 C49,42 57,40 67,34 C78,28 87,24 96,17\"/><path class=\"map-water\" d=\"M25,68 C34,58 39,55 43,46 C48,36 54,35 61,31\"/>","terrain":[{"type":"symbol","x":30,"y":35,"symbol":"♣"},{"type":"symbol","x":36,"y":31,"symbol":"♣"},{"type":"symbol","x":43,"y":33,"symbol":"♣"},{"type":"symbol","x":75,"y":22,"symbol":"▲"},{"type":"symbol","x":82,"y":18,"symbol":"▲"},{"type":"symbol","x":89,"y":15,"symbol":"▲"},{"type":"path","kind":"river","d":"M27,62 C37,57 41,52 47,46 C53,40 57,38 63,34"},{"type":"path","kind":"road","d":"M8,66 C24,59 36,50 49,44 C61,39 70,32 81,25 C87,21 92,19 97,17"}],"nodes":[{"id":"brackencliff","title":"Brackencliff","x":10,"y":66,"reveal":13,"scenes":["intro","briefing","forge","cliff_excavation","first_mile","farmstead"]},{"id":"greywood","title":"Greywood Fork","x":27,"y":52,"reveal":12,"scenes":["woodland_edge","pine_road","river_road"]},{"id":"pine","title":"High Pine Road","x":40,"y":34,"reveal":10,"scenes":["charcoal_camp","stag_stones","pine_camp","pine_descent"]},{"id":"river","title":"River Tern","x":42,"y":58,"reveal":10,"scenes":["ferry_house","drowned_marker","river_hamlet","river_camp","river_exit"]},{"id":"span","title":"Broken Span","x":61,"y":44,"reveal":13,"scenes":["broken_span","span_wave1","span_choice","span_final","after_span"]},{"id":"hollowmere","title":"Hollowmere","x":74,"y":36,"reveal":11,"scenes":["hollowmere","hollow_inn","hollow_forge","hollow_records"]},{"id":"pass","title":"Crown Pass","x":88,"y":20,"reveal":12,"scenes":["mountain_departure","ridge1","ridge2","ridge3","tunnel1","tunnel2","tunnel3","pass_reunion","final_view"]}]};
+
+// V1.3 finale: a final battle and an earned sacrifice decision.
+Object.assign(scenes,{
+  final_view:{title:'Beyond the Known Maps',mission:'Understand what has answered from beyond Crown Pass before deciding whether to approach it.',text:[
+    'East of the pass, the land falls away into a valley no modern map records.',
+    'At its centre stands the outline of a city — miles distant, roofless in places, but unmistakably inhabited by light. Seven towers answer one another in sequence.',
+    'The Glass Road beneath your feet warms. For the first time, the pulse does not pass under you and continue east.',
+    'It stops.',
+    'Then something in the distant city answers — and a narrow receiving span unfolds from the mountainside below you.'
+  ],choices:[['study','Read the answering sequence before moving','Sense Check · Knowledge or Spirit'],['signal','Answer with the Bell Cairn pattern','Support · Knowledge or Spirit'],['advance','Advance carefully toward the receiving station','Continue']]},
+  receiver_threshold:{title:'The Receiving Span',mission:"Reach the ancient receiver while the Road's guardians wake around you.",text:[
+    'The new span is barely wide enough for four people abreast. It hangs over cloud, black glass lit from within by blue-white current.',
+    'Halfway across, shapes rise from recesses in the bridge: not hounds this time, but tall jointed wardens built from glass and dark metal.',
+    'Behind you, the span begins folding itself away from Crown Pass. Ahead, the receiving tower opens like an eye.',
+    'There is no clean retreat. The company has to win enough ground to reach the tower before the bridge withdraws.'
+  ],choices:[['hold','Hold the wardens while the company crosses','Team battle · dangerous'],['redirect',"Turn the Road's own signal against the wardens",'Support · Craft or Knowledge · dangerous']]},
+  receiver_assault:{title:'The Last Twenty Paces',mission:'Break through the final defence before the receiving span collapses.',text:[
+    'The first wardens fall, but the Road reacts immediately. Light races beneath your feet and the far tower begins closing.',
+    'A second wave steps out of the walls as the span fractures behind the company. Mara shouts that the opening is not a door — it is a handoff between stations.',
+    'Someone must keep the path stable long enough for the others to reach the receiver mechanism.'
+  ],choices:[['push','Make the final push together','Team battle · dangerous'],['control','Reach the control seams and force the tower to hold','Support · Craft or Knowledge · dangerous']]},
+  keeper_choice:{title:'The Road Demands a Keeper',mission:'Decide what — or whom — the company is willing to leave behind.',text:[
+    'The receiver chamber hums with living blue light. At its centre is a circular operating platform shaped for one person.',
+    "Ilyra translates the inscription twice before she is willing to say it aloud: the crossing remains stable only while a living keeper maintains the handoff. When the others pass, the station seals around the keeper.",
+    "Mara removes her gloves and steps toward the platform. ‘I brought you here. If this is the price, it is mine.’",
+    "Dain catches her arm. ‘No. You brought us to the truth. That does not mean you own the cost.’",
+    'For the first time since Brackencliff, nobody looks at the Road. Everyone looks at one another.'
+  ],choices:[['hero','I will stay. Get the others across.','Sacrifice your hero for the company'],['pass','Ask the others — does someone else volunteer?','Pass the decision to the next hero'],['mara',"Accept Mara's offer",'Mara stays behind'],['dain','Let Dain take her place','Dain stays behind'],['rewrite','Use what you learned to rewrite the handoff','Hidden solution · everyone may live','flag','keeper_solution'],['improvise','Try to force another solution from the mechanism','Very hard · Craft / Knowledge / Spirit'],['sever','Destroy the receiver instead','No sacrifice · the Road is severed'],['retreat','Refuse the sacrifice and retreat while you can','No sacrifice · accept failure']]}
+});
+Object.assign(sceneImages,{final_view:'assets/receiver_assault_v13.jpg',receiver_threshold:'assets/receiver_assault_v13.jpg',receiver_assault:'assets/receiver_assault_v13.jpg',keeper_choice:'assets/keeper_chamber_v13.jpg'});
+Object.assign(sceneArt,{receiver_threshold:['⚔','The receiving span wakes'],receiver_assault:['⚔','The last twenty paces'],keeper_choice:['◈','Someone must hold the Road']});
+
+const worldMapConfig={"title":"The Glass Road — First Crossing","baseSvg":"<path class=\"map-road\" d=\"M7,66 C18,60 27,54 37,48 C49,42 57,40 67,34 C78,28 87,24 96,17\"/><path class=\"map-water\" d=\"M25,68 C34,58 39,55 43,46 C48,36 54,35 61,31\"/>","terrain":[{"type":"symbol","x":30,"y":35,"symbol":"♣"},{"type":"symbol","x":36,"y":31,"symbol":"♣"},{"type":"symbol","x":43,"y":33,"symbol":"♣"},{"type":"symbol","x":75,"y":22,"symbol":"▲"},{"type":"symbol","x":82,"y":18,"symbol":"▲"},{"type":"symbol","x":89,"y":15,"symbol":"▲"},{"type":"path","kind":"river","d":"M27,62 C37,57 41,52 47,46 C53,40 57,38 63,34"},{"type":"path","kind":"road","d":"M8,66 C24,59 36,50 49,44 C61,39 70,32 81,25 C87,21 92,19 97,17"}],"nodes":[{"id":"brackencliff","title":"Brackencliff","x":10,"y":66,"reveal":13,"scenes":["intro","briefing","forge","cliff_excavation","first_mile","farmstead"]},{"id":"greywood","title":"Greywood Fork","x":27,"y":52,"reveal":12,"scenes":["woodland_edge","pine_road","river_road"]},{"id":"pine","title":"High Pine Road","x":40,"y":34,"reveal":10,"scenes":["charcoal_camp","stag_stones","pine_camp","pine_descent"]},{"id":"river","title":"River Tern","x":42,"y":58,"reveal":10,"scenes":["ferry_house","drowned_marker","river_hamlet","river_camp","river_exit"]},{"id":"span","title":"Broken Span","x":61,"y":44,"reveal":13,"scenes":["broken_span","span_wave1","span_choice","span_final","after_span"]},{"id":"hollowmere","title":"Hollowmere","x":74,"y":36,"reveal":11,"scenes":["hollowmere","hollow_inn","hollow_forge","hollow_records"]},{"id":"pass","title":"Crown Pass","x":88,"y":20,"reveal":12,"scenes":["mountain_departure","ridge1","ridge2","ridge3","tunnel1","tunnel2","tunnel3","pass_reunion","final_view","receiver_threshold","receiver_assault","keeper_choice"]}]};
 
 function requirementSatisfied(choice){
   const type=choice[3],value=choice[4],n=choice[5];if(!type)return true;
@@ -277,7 +309,7 @@ function npcForScene(scene){
   if(scene==='hollow_records')return 'Clerk';
   if(scene==='river_hamlet')return 'Elder';
   if(scene==='ridge3')return 'Scout';
-  if(['intro','briefing','cliff_excavation','first_mile','final_view'].includes(scene))return 'Mara';
+  if(['intro','briefing','cliff_excavation','first_mile','final_view','receiver_threshold','receiver_assault','keeper_choice'].includes(scene))return 'Mara';
   if(['woodland_edge','pine_descent','river_exit','mountain_departure'].includes(scene))return 'Dain';
   if(['stag_stones','span_choice','ridge2','tunnel2','pass_reunion'].includes(scene))return 'Ilyra';
   if(['broken_span','after_span'].includes(scene))return 'Rook';
@@ -306,7 +338,7 @@ function finaleCallbackCards(){const a=state.allies||{},f=state.flags||{},items=
   return cards.slice(0,6);
 }
 function reactiveMemoryCards(scene){const f=state?.flags||{},cards=[],p=player(),rep=earnedReputationTitle(p);if(rep&&['farmstead','broken_span','hollowmere','pass_reunion'].includes(scene))cards.push([rep.icon,`${p.name} is becoming known as ${rep.title}`,`The company has begun to expect ${p.name} to act in this role. Later checks and the ending remember it.`]);if(scene==='broken_span'&&state?.allies?.edda)cards.push(['🌾','A promise from the last farm','You promised Edda Varn that discovery would not matter more than warning the people who live beside the Road.']);if(scene==='after_span'&&f.road_answered)cards.push(['◈','You made the Road answer','This was not passive discovery: the party deliberately sent a signal into the network.']);if(scene==='hollowmere'&&(state?.items||[]).includes('glass_core'))cards.push(['⚒','The Hound Core can become equipment','Master Sella can bind the recovered core into one hero’s weapon or focus.']);if(scene==='mountain_departure'&&f.severed_on_purpose)cards.push(['✂','The crossing was severed deliberately','The mountain is now the site of an old decision, not merely an obstacle.']);if(scene==='pass_reunion'&&f.road_listens)cards.push(['✧','The Road is listening','Milestones, guardians and maintenance doors now make sense as one responsive system.']);return cards;}
-function renderFinaleCallbacks(scene){const box=$('callbackPanel');if(!box)return;let cards=reactiveMemoryCards(scene);if(['pass_reunion','final_view'].includes(scene))cards=[...cards,...finaleCallbackCards()];if(!cards.length){box.classList.add('hidden');box.innerHTML='';return;}box.innerHTML=`<div class="eyebrow">THE JOURNEY REMEMBERS</div><div class="callback-grid">${cards.map(c=>`<div class="callback-card"><span>${c[0]}</span><div><b>${esc(c[1])}</b><p>${esc(c[2])}</p></div></div>`).join('')}</div>`;box.classList.remove('hidden');}
+function renderFinaleCallbacks(scene){const box=$('callbackPanel');if(!box)return;let cards=reactiveMemoryCards(scene);if(['pass_reunion','final_view','receiver_threshold','receiver_assault','keeper_choice'].includes(scene))cards=[...cards,...finaleCallbackCards()];if(!cards.length){box.classList.add('hidden');box.innerHTML='';return;}box.innerHTML=`<div class="eyebrow">THE JOURNEY REMEMBERS</div><div class="callback-grid">${cards.map(c=>`<div class="callback-card"><span>${c[0]}</span><div><b>${esc(c[1])}</b><p>${esc(c[2])}</p></div></div>`).join('')}</div>`;box.classList.remove('hidden');}
 function openingHeroDescription(p){
   const cls=p?.cls||'Adventurer', bg=p?.background||'Outlander';
   const stats=Object.entries(p?.stats||{}).sort((a,b)=>b[1]-a[1]);
@@ -342,18 +374,16 @@ function journalQuestions(){
   if(!f.road_network)q.push('Was the Glass Road built to reach one place, or to connect many?');
   if(!f.road_infrastructure)q.push('What besides travellers moved through the Road?');
   if(!f.severed_on_purpose&&state?.chapter>=3)q.push('Why was the eastern crossing deliberately closed?');
-  if(!state?.finalChoice)q.push('Who is answering from beyond Crown Pass?');
+  if(!state?.finalChoice)q.push(state?.scene==='keeper_choice'?'Can the Road be held without leaving someone behind?':'Who is answering from beyond Crown Pass?');
   return q.slice(0,5);
 }
 function battleState(scene){
   const f=state?.flags||{};
   const stages={broken_span:1,span_wave1:1,span_choice:2,span_final:3};
-  const stage=stages[scene];if(!stage)return null;
-  return {title:`Broken Span · Phase ${stage}/3`,items:[
-    ['Company line',f.span_line_held?'steady':'under pressure'],
-    ['Road signal',f.marker_control||f.road_answered?'understood':'unknown'],
-    ['Glass hounds',f.spared_hounds?'released':f.fought_hounds?'engaged':'active']
-  ]};
+  if(stages[scene]){const stage=stages[scene];return {title:`Broken Span · Phase ${stage}/3`,items:[['Company line',f.span_line_held?'steady':'under pressure'],['Road signal',f.marker_control||f.road_answered?'understood':'unknown'],['Glass hounds',f.spared_hounds?'released':f.fought_hounds?'engaged':'active']]};}
+  const finale={receiver_threshold:1,receiver_assault:2};
+  if(finale[scene])return {title:`Receiving Span · Phase ${finale[scene]}/2`,items:[['Crossing',f.receiver_line?'held':'collapsing'],['Wardens',f.receiver_redirect?'disrupted':'active'],['Tower handoff',f.receiver_open?'within reach':'closing']]};
+  return null;
 }
 const restScenes=new Set(['forge','pine_camp','river_camp','hollow_forge']);
 function sceneKind(scene){
@@ -373,6 +403,8 @@ function passiveInsight(scene,p){
   if(scene==='span_choice'&&p.cls==='Mage')return `${p.name} notices the hounds move a fraction after the milestone brightens.`;
   if(scene==='hollow_records'&&bg==='Scholar')return `${p.name} knows missing pages can often be reconstructed from indexes, citations and neighbouring entries.`;
   if(scene==='tunnel2'&&p.cls==='Engineer')return `${p.name} recognises a civic utility system: transport, water and heat were designed together.`;
+  if(scene==='keeper_choice'&&p.cls==='Monk')return `${p.name} hears the inscription differently: it describes a duty, not a death sentence. Ancient systems can be obeyed — or reinterpreted.`;
+  if(scene==='keeper_choice'&&p.cls==='Engineer')return `${p.name} sees redundancy in the handoff mechanism. The builders expected failure and left alternate paths.`;
   return '';
 }
 function itemCallback(scene){
@@ -513,34 +545,32 @@ function renderLastRoll(){
 function renderEnding(){
   show('ended');
   document.querySelector('#ended .eyebrow').textContent='THE GLASS ROAD — FIRST CROSSING COMPLETE';
-  document.querySelector('#ended h1').textContent='Beyond the Known Maps';
-  $('endingArt').style.backgroundImage="linear-gradient(0deg,rgba(5,10,18,.72),rgba(5,10,18,.08)),url('assets/final_ai.jpg')";
-  const choices={
-    truth:'The company returns to Hollowmere determined to report exactly what lies beyond Crown Pass: an active Road, a distant lit city, and a system nobody yet understands. Discovery will be public — and so will the warning.',
-    secret:'The company returns with evidence that the Road is active but keeps the distant city out of the first report. The choice buys time to understand what is awake before kings, investors and armies arrive.',
-    forward:'The company goes one mile farther before turning back. The Road remains warm beneath their feet, and somewhere beyond the valley seven towers continue answering one another.'
+  const f=state.flags||{}, sacrificed=state.players.find(p=>p.sacrificed);
+  const endings={
+    hero_sacrifice:[sacrificed?`${sacrificed.name} Held the Road`:'A Hero Held the Road',sacrificed?`${sacrificed.name} stepped onto the keeper platform so the company could live. The receiver sealed around them as the last hero crossed. Beyond Crown Pass, the Road remained open because one member of the company chose everyone else.`:'One hero remained behind so the others could cross.'],
+    mara_sacrifice:['Mara Vale Held the Road','Mara stayed at the receiver she had spent years trying to find. Her final instruction was not about maps: “Tell them who paid for the first crossing.” The company reached safety while the Road closed around her.'],
+    dain_sacrifice:['Dain Holt Stayed Behind','Dain took the keeper platform before Mara could stop him. “A road-captain gets people home,” he said. The crossing held until the last traveller was safe, and then Dain vanished behind blue glass.'],
+    everyone_lives:['Another Way','Everything the company learned — the timed pulse, the water galleries, the answering milestones, the bells — finally connected. The keeper was not a sacrifice. It was a synchronization role. You rewrote the handoff, transferred it between stations, and walked out together.'],
+    severed:['The Road Falls Silent','Rather than feed a life into a system you did not understand, the company broke the receiver. Blue light withdrew through the valley. The distant city remained visible, but the Glass Road went cold beneath your feet.'],
+    retreat:['No One Was Left Behind','The company refused to leave a person inside the receiver. You withdrew before the span closed, losing the active crossing but carrying home proof that the old system demanded a price you were not willing to pay.']
   };
+  const [title,lead]=endings[state.finalChoice]||['Beyond the Known Maps','The company returns knowing the Glass Road is awake and that the First Crossing changed them.'];
+  document.querySelector('#ended h1').textContent=title;
+  $('endingArt').style.backgroundImage="linear-gradient(0deg,rgba(5,10,18,.72),rgba(5,10,18,.08)),url('assets/keeper_chamber_v13.jpg')";
   const routeNames=(state.routeHistory||[]).filter(r=>r.complete).map(r=>r.name).filter(Boolean);
   const trusted=Object.values(state.journal?.people||{}).filter(p=>['trusting','confiding','cooperating','competitive respect','wary respect','open','respectful','trusted interpreter'].includes(String(p.status||'').toLowerCase())).map(p=>p.name);
   const remainingItems=(state.items||[]).map(id=>state.itemCatalog?.[id]?.name||id.replaceAll('_',' '));
   const callbacks=[];
-  if(state.flags?.road_network)callbacks.push('You established that the Glass Road was once a network, not a road to one destination.');
-  if(state.flags?.road_infrastructure)callbacks.push('You discovered that the Road carried utilities and signals as well as travellers.');
-  if(state.flags?.severed_on_purpose)callbacks.push('You found evidence that the eastern network was deliberately severed.');
-  if(state.flags?.road_listens)callbacks.push('You learned that the Road listens for structured signals and can answer.');
-  if(state.allies?.edda)callbacks.push('You still owe Edda Varn an honest warning on the return journey.');
-  if(state.allies?.rook||state.flags?.rook_cooperated)callbacks.push('Cassian Rook is no longer merely a name ahead on the Road; your choices created a complicated relationship.');
-  $('endingText').innerHTML=`
-    <p class="finale-lead">${choices[state.finalChoice]||choices.truth}</p>
-    ${callbacks.length?`<div class="ending-callbacks"><b>What your First Crossing changed</b><ul>${callbacks.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}
-    ${routeNames.length?`<p><b>Routes taken:</b> ${routeNames.map(esc).join(', ')}.</p>`:''}
-    ${trusted.length?`<p><b>Relationships carried home:</b> ${trusted.map(esc).join(', ')}.</p>`:''}
-    ${remainingItems.length?`<p><b>Evidence still in the company’s pack:</b> ${remainingItems.map(esc).join(', ')}.</p>`:''}
-    <h2>The Company After the Crossing</h2>
-    ${state.players.map(p=>`<div class="epilogue"><b>${classInfo[p.cls]?.icon||'✦'} ${esc(p.name)} — ${p.cls}</b><p>${heroEpilogue(p)}</p><span>Highest skill: ${strongestSkill(p)} · Wounds ${p.wounds}/3 · Unspent Skill Points ${p.skillPoints||0}</span></div>`).join('')}
-    <p class="finale-close"><b>You began with a road uncovered by an earthquake.</b><br>You return knowing that something beyond the maps is awake — and that the Road remembers how you approached it.</p>`;
-  document.querySelector('.next-session').innerHTML='<div class="eyebrow">THE END OF THE FIRST CROSSING</div><h2>The road continues east.</h2><p>This vertical-slice campaign is designed to end with questions, relationships and evidence that can carry into a larger Glass Road campaign.</p>';
-  playSound('success');
+  if(f.road_network)callbacks.push('You proved the Glass Road was once a network, not a single road.');
+  if(f.road_infrastructure)callbacks.push('You learned that the Road carried heat, water and signals as well as travellers.');
+  if(f.severed_on_purpose)callbacks.push('You discovered that an earlier generation deliberately broke this connection.');
+  if(f.road_listens)callbacks.push('You learned that the Road listens for structured signals and can answer.');
+  if(f.keeper_solution)callbacks.push('Enough earlier clues survived to reveal that the keeper rule could be rewritten.');
+  if(state.allies?.edda)callbacks.push('Edda Varn is still waiting for the warning you promised to bring back.');
+  const memorial=state.finalChoice==='hero_sacrifice'&&sacrificed?`<div class="memorial-card"><div class="eyebrow">THE ROAD REMEMBERS</div><h2>${esc(sacrificed.name)}</h2><p>${esc(sacrificed.name)} gave up the return journey so the company could have one. Travellers who later reach Crown Pass touch the keeper-stone before crossing and speak their name.</p></div>`:state.finalChoice==='mara_sacrifice'?`<div class="memorial-card"><div class="eyebrow">THE ROAD REMEMBERS</div><h2>Mara Vale</h2><p>The first reliable map of the eastern crossing leaves one place blank. In the margin Dain writes: “Here a cartographer became the road home.”</p></div>`:state.finalChoice==='dain_sacrifice'?`<div class="memorial-card"><div class="eyebrow">THE ROAD REMEMBERS</div><h2>Dain Holt</h2><p>Future road-captains call the first safe shelter east of the pass Holt's Rest. No traveller is charged for a bed there.</p></div>`:'';
+  $('endingText').innerHTML=`<p class="finale-lead">${esc(lead)}</p>${memorial}${callbacks.length?`<div class="ending-callbacks"><b>What your First Crossing changed</b><ul>${callbacks.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}${routeNames.length?`<p><b>Routes taken:</b> ${routeNames.map(esc).join(', ')}.</p>`:''}${trusted.length?`<p><b>Relationships carried home:</b> ${trusted.map(esc).join(', ')}.</p>`:''}${remainingItems.length?`<p><b>Evidence in the company’s pack:</b> ${remainingItems.map(esc).join(', ')}.</p>`:''}<h2>The Company After the Crossing</h2>${state.players.map(p=>`<div class="epilogue ${p.sacrificed?'sacrificed':''}"><b>${classInfo[p.cls]?.icon||'✦'} ${esc(p.name)} — ${p.cls}${p.sacrificed?' · KEEPER':''}</b><p>${p.sacrificed?`${esc(p.name)} did not return from the receiving station. Their choice became part of every later telling of the First Crossing.`:heroEpilogue(p)}</p><span>Highest skill: ${strongestSkill(p)} · Wounds ${p.wounds}/3 · Unspent Skill Points ${p.skillPoints||0}</span></div>`).join('')}<p class="finale-close"><b>The Road remembers who crossed it.</b><br>Now the people west of Crown Pass must decide what to do with the story you bring home.</p>`;
+  document.querySelector('.next-session').innerHTML='<div class="eyebrow">THE END OF THE FIRST CROSSING</div><h2>The road continues east.</h2><p>The larger campaign can begin from the consequence of this choice: a living keeper, a broken Road, a rescued company — or proof that the old rules can be changed.</p>';
+  playSound(state.finalChoice&&state.finalChoice.includes('sacrifice')?'mystery':'success');
 }
 function strongestSkill(p){const entries=Object.entries(p.stats||{});entries.sort((a,b)=>b[1]-a[1]);return `${entries[0]?.[0]||'—'} ${entries[0]?.[1]||0}`;}
 function heroEpilogue(p){

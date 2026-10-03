@@ -179,3 +179,9 @@ html:fullscreen .topbar{position:sticky;top:0;z-index:20;background:rgba(8,13,18
 .scene-art{transition:background-position 4s ease}.scene-art:hover{background-position:center 46%!important}
 @media(max-width:720px){.reputation-grid{grid-template-columns:1fr 1fr}.condition-meter{grid-template-columns:1fr}.condition-meter>b{font-size:.78rem}}
 @media(prefers-reduced-motion:reduce){.scene-art.scene-enter,.story-panel.story-step,.game-main.story-step,.die.rolling{animation:none!important}}
+
+/* V1.3 keeper finale */
+.scene-art.keeper_choice{min-height:430px;box-shadow:inset 0 -120px 120px rgba(2,5,12,.72),0 18px 44px rgba(0,0,0,.35)}
+.memorial-card{margin:22px 0;padding:22px 24px;border:1px solid rgba(224,177,78,.55);border-radius:14px;background:linear-gradient(135deg,rgba(37,28,15,.88),rgba(10,17,29,.92));box-shadow:0 14px 34px rgba(0,0,0,.25)}
+.memorial-card h2{margin:.2rem 0 .45rem;color:#f3d690}.epilogue.sacrificed{border-color:rgba(224,177,78,.6);background:rgba(57,38,17,.35)}
+body .scene-art.receiver_threshold,body .scene-art.receiver_assault{min-height:400px}
