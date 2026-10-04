@@ -1,6 +1,6 @@
 # The Glass Road — The First Crossing
 
-**V1.7.0 — Flagship Animated Build**
+**V1.7.1 — Simplified Animated Atmosphere Build**
 
 This build rolls all current fixes and visual upgrades into one clean playtest package.
 
@@ -46,3 +46,10 @@ Deploy on Render as a **Web Service**.
 - **Phase B:** built-in animated story-beats montage on the home screen.
 - **Phase C:** upgraded scene reveals and in-game chapter art motion.
 - **Phase D:** animated class portrait gallery plus subtle portrait motion throughout the interface.
+
+
+## V1.7.1 refinements
+
+- Simplified the landing page again by removing the extra cinematic-story and animated-hero promo sections.
+- Added an **actual looping animated hero image** for the main landing-page artwork.
+- Shifted the motion emphasis into the **story moments themselves** using atmospheric overlays: moving forest mist, soft tree sway, drifting mountain cloud, river haze, danger pulses, and settlement smoke/light.

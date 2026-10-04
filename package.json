@@ -1,8 +1,8 @@
 {
   "name": "glass-road-first-crossing",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "private": true,
-  "description": "GM-less cooperative fantasy RPG: The Glass Road — The First Crossing (V1.7.0 flagship animated build, full HQ art, animated scenes and portraits)",
+  "description": "GM-less cooperative fantasy RPG: The Glass Road — The First Crossing (V1.7.1 simplified landing, animated hero loop, atmospheric story-scene motion)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
