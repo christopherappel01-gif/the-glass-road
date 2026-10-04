@@ -539,7 +539,12 @@ function renderLastRoll(){
     const mainDie=r.rollMode==='advantage'?Math.max(...r.dice):r.rollMode==='disadvantage'?Math.min(...r.dice):r.dice.reduce((a,b)=>a+b,0);
     html=`<div class="roll-card cinematic-result"><b>${esc(r.desc)}</b><div class="dice-row">${r.dice.map(d=>`<span class="die rolling">${d}</span>`).join('')}</div><p>Main roll: ${mainDie} + skill ${r.bonus}${r.supportBonus?` + support ${r.supportBonus}`:''} = <b>${r.total}</b> vs ${r.difficulty}</p>${r.support?`<p class="small">${esc(r.support.name)} supported with ${esc(r.support.skill)}: ${r.support.total} ${r.support.ok?'✓ +2':'✕ no bonus'}</p>`:''}${heroicHtml}${complicationHtml}<div class="result-banner ${r.success?'ok':'bad'}">${r.success?'SUCCESS!':'SETBACK'}</div>${!r.success?`<p class="small muted">${r.dangerous?'This was dangerous — the active hero may be wounded.':'No wound: this setback changes the situation instead.'}</p>`:''}</div>`;
   }
-  $('rollResult').innerHTML=html;const card=$('rollResult').querySelector('.roll-card');if(card){card.classList.add('dismissible-result');card.setAttribute('title','Click to dismiss');card.insertAdjacentHTML('beforeend','<div class="dismiss-result-hint">Dismiss ×</div>');card.onclick=()=>{dismissedRollKey=key;$('rollResult').innerHTML='';};}
+  $('rollResult').innerHTML=html;const card=$('rollResult').querySelector('.roll-card');if(card){
+    card.classList.add('dismissible-result');
+    card.insertAdjacentHTML('afterbegin','<button class="roll-dismiss-button" type="button" aria-label="Close dice result" title="Close dice result"><span aria-hidden="true">×</span></button>');
+    const closeBtn=card.querySelector('.roll-dismiss-button');
+    closeBtn.onclick=(event)=>{event.stopPropagation();dismissedRollKey=key;$('rollResult').innerHTML='';};
+  }
   if(key!==lastRollSeen){lastRollSeen=key;dismissedRollKey='';playSound(r.success===false?'fail':'dice');setTimeout(()=>playSound(r.success===false?'fail':'success'),480);}
 }
 function renderEnding(){

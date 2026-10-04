@@ -185,3 +185,52 @@ html:fullscreen .topbar{position:sticky;top:0;z-index:20;background:rgba(8,13,18
 .memorial-card{margin:22px 0;padding:22px 24px;border:1px solid rgba(224,177,78,.55);border-radius:14px;background:linear-gradient(135deg,rgba(37,28,15,.88),rgba(10,17,29,.92));box-shadow:0 14px 34px rgba(0,0,0,.25)}
 .memorial-card h2{margin:.2rem 0 .45rem;color:#f3d690}.epilogue.sacrificed{border-color:rgba(224,177,78,.6);background:rgba(57,38,17,.35)}
 body .scene-art.receiver_threshold,body .scene-art.receiver_assault{min-height:400px}
+
+/* V1.4 landing-page + result-panel polish */
+.home-screen .hero-banner--opening{
+  min-height:520px;
+  background-image:
+    linear-gradient(90deg,rgba(3,7,13,.96) 0%,rgba(3,7,13,.78) 34%,rgba(3,7,13,.30) 66%,rgba(3,7,13,.08) 100%),
+    linear-gradient(0deg,rgba(3,7,13,.78),transparent 58%),
+    url('assets/brackencliff_v12.jpg');
+  background-size:cover;
+  background-position:center 49%;
+  isolation:isolate;
+}
+.home-screen .hero-banner--opening:before,.home-screen .hero-banner--opening:after{display:none}
+.hero-banner__content--wide{width:min(760px,76%);padding:58px 48px 170px}
+.hero-banner__content--wide h1{font-size:clamp(3rem,7vw,5.8rem);letter-spacing:-.035em;text-shadow:0 7px 28px rgba(0,0,0,.55)}
+.hero-tagline{font-family:Georgia,serif;font-size:clamp(1.25rem,2.3vw,1.75rem)!important;line-height:1.28!important;color:#fff!important;margin-bottom:12px}
+.hero-subtitle{font-size:1.03rem!important;line-height:1.68!important;max-width:670px!important;color:#dfe8ed!important}
+.hero-banner__actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.hero-banner__microcopy{margin-top:13px;color:#c4d0d7;font-size:.8rem;font-weight:700;letter-spacing:.015em}
+.hero-feature-pills{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0 0}
+.hero-feature-pills span{display:inline-flex;align-items:center;min-height:34px;padding:7px 10px;border-radius:999px;background:rgba(9,18,24,.68);border:1px solid rgba(184,238,231,.27);box-shadow:0 5px 18px rgba(0,0,0,.18);backdrop-filter:blur(8px);font-size:.78rem;font-weight:800;color:#eaf7f5}
+.hero-preview-strip{position:absolute;z-index:2;left:22px;right:22px;bottom:20px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.hero-preview-card{min-height:132px;padding:14px 15px;border-radius:14px;border:1px solid rgba(210,241,236,.18);background:linear-gradient(180deg,rgba(11,21,28,.85),rgba(9,16,23,.92));box-shadow:0 10px 28px rgba(0,0,0,.24);backdrop-filter:blur(12px)}
+.hero-preview-card .feature-icon{font-size:1.2rem;margin-bottom:4px}.hero-preview-card h3{font-size:1rem;margin:.28rem 0 .35rem}.hero-preview-card p{font-size:.76rem;line-height:1.42!important;color:#c9d4da!important;margin:0}.hero-preview-card .eyebrow{font-size:.62rem}
+.home-classes-strip{margin-top:0;border-color:rgba(136,217,207,.2)}
+
+.dismissible-result{position:relative;padding-top:22px;padding-right:64px;border-color:rgba(184,238,231,.36);box-shadow:0 16px 42px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.025)}
+.roll-dismiss-button{position:absolute;top:10px;right:10px;width:46px;height:46px;display:grid;place-items:center;border-radius:13px;border:1px solid rgba(184,238,231,.28);background:rgba(24,39,50,.92);color:#eaf8f6;box-shadow:0 5px 16px rgba(0,0,0,.24);cursor:pointer;transition:transform .12s ease,background .12s ease,border-color .12s ease}
+.roll-dismiss-button span{font-size:2rem;line-height:.8;font-weight:300;transform:translateY(-1px)}
+.roll-dismiss-button:hover{transform:translateY(-1px);background:#243d4a;border-color:rgba(184,238,231,.62)}
+.roll-dismiss-button:active{transform:translateY(1px)}
+.roll-dismiss-button:focus-visible{outline:3px solid rgba(184,238,231,.45);outline-offset:2px}
+
+@media(max-width:980px){
+  .home-screen .hero-banner--opening{min-height:680px}
+  .hero-banner__content--wide{width:92%;padding:44px 30px 340px}
+  .hero-preview-strip{grid-template-columns:1fr 1fr}
+}
+@media(max-width:620px){
+  .home-screen .hero-banner--opening{min-height:880px;background-position:61% center}
+  .hero-banner__content--wide{width:100%;padding:34px 20px 590px}
+  .hero-banner__content--wide h1{font-size:3.2rem}
+  .hero-banner__actions{display:grid}.hero-banner__actions .btn{width:100%}
+  .hero-feature-pills span{font-size:.72rem}
+  .hero-preview-strip{left:12px;right:12px;bottom:12px;grid-template-columns:1fr;gap:8px}
+  .hero-preview-card{min-height:auto;padding:12px 13px}.hero-preview-card p{font-size:.74rem}
+  .dismissible-result{padding-right:58px}
+  .roll-dismiss-button{width:48px;height:48px;top:8px;right:8px}
+}
