@@ -1,8 +1,8 @@
 {
   "name": "glass-road-first-crossing",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "private": true,
-  "description": "GM-less cooperative fantasy RPG: The Glass Road \u2014 The First Crossing (V1.4.2 hero portrait asset fix)",
+  "description": "GM-less cooperative fantasy RPG: The Glass Road — The First Crossing (V1.4.3 dice reliability + persistent hints)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
