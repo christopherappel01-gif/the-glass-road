@@ -9,6 +9,13 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { pingTimeout: 20000, pingInterval: 10000 });
 const PORT = process.env.PORT || 3000;
+
+// Render/proxy stability: keep HTTP connection timeouts comfortably above
+// common reverse-proxy keep-alive windows, and log process-level failures.
+server.keepAliveTimeout = 65000;
+server.headersTimeout = 66000;
+process.on('unhandledRejection', (err) => console.error('[unhandledRejection]', err));
+process.on('uncaughtException', (err) => console.error('[uncaughtException]', err));
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/health', (req, res) => res.status(200).send('ok'));
 
