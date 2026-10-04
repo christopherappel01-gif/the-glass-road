@@ -1,8 +1,8 @@
 {
   "name": "glass-road-first-crossing",
-  "version": "1.4.3",
+  "version": "1.6.0",
   "private": true,
-  "description": "GM-less cooperative fantasy RPG: The Glass Road — The First Crossing (V1.4.3 dice reliability + persistent hints)",
+  "description": "GM-less cooperative fantasy RPG: The Glass Road — The First Crossing (V1.6.0 full HQ art pass, upgraded portraits, WebP optimization)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

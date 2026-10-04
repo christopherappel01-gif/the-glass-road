@@ -11,29 +11,29 @@ const classInfo = {
   Engineer:{icon:'⚙️',gift:'Improviser — gains +1 to Craft checks; invaluable with mechanisms, repairs and construction.',fav:['Craft','Knowledge','Strength'],build:{Strength:3,Agility:1,Endurance:2,Awareness:2,Survival:1,Stealth:0,Knowledge:4,Craft:5,Influence:1,Spirit:1}}
 };
 const sceneArt={"intro":["◈","Brackencliff After the Quake"],"briefing":["◈","The Expedition Table"],"forge":["◈","The Forge Before the Road"],"cliff_excavation":["◈","The First Exposed Mile"],"first_mile":["◈","The Road Under the Fields"],"farmstead":["◈","The Last Farm"],"woodland_edge":["◈","Where the Old Maps End"],"pine_road":["♣","Under the High Pines"],"charcoal_camp":["♣","The Charcoal Burner's Camp"],"stag_stones":["♣","The Stag Stones"],"pine_camp":["♣","Camp Above the Tern"],"pine_descent":["♣","The Long Descent"],"river_road":["≋","Along the River Tern"],"ferry_house":["≋","The Empty Ferry House"],"drowned_marker":["≋","The Drowned Marker"],"river_hamlet":["≋","Three Houses at Lowwater"],"river_camp":["≋","Rain at Lowwater"],"river_exit":["≋","The Flooded Approach"],"broken_span":["⚔","The Broken Span"],"span_wave1":["⚔","Glass Hounds"],"span_choice":["⚔","The Bridge Turns"],"span_final":["⚔","The Tone Beneath the Bridge"],"after_span":["⚔","Two Expeditions, One Road"],"hollowmere":["⌂","Hollowmere"],"hollow_forge":["⌂","The Mountain Forge"],"hollow_inn":["⌂","The Lantern Inn"],"hollow_records":["⌂","The Toll-House Archive"],"mountain_departure":["▲","Leaving Hollowmere"],"ridge1":["▲","The Wind Stair"],"ridge2":["▲","The Bell Cairn"],"ridge3":["▲","The White Ledge"],"tunnel1":["▲","The Maintenance Door"],"tunnel2":["▲","The Water Galleries"],"tunnel3":["▲","The Closed Chamber"],"pass_reunion":["▲","The First Crossing"],"final_view":["✧","Beyond the Known Maps"]};
-const sceneImages={"intro":"assets/brackencliff_v12.jpg","briefing":"assets/scene_briefing.jpg","forge":"assets/scene_forge.jpg","cliff_excavation":"assets/scene_cliff_excavation.jpg","first_mile":"assets/first_mile_ai.jpg","farmstead":"assets/scene_farmstead.jpg","woodland_edge":"assets/hq_greywood_road.png","pine_road":"assets/hq_greywood_road.png","charcoal_camp":"assets/hq_charcoal_camp.png","stag_stones":"assets/hq_stag_stones.png","pine_camp":"assets/hq_pine_camp.png","pine_descent":"assets/hq_pine_camp.png","river_road":"assets/hq_river_road.png","ferry_house":"assets/hq_river_road.png","drowned_marker":"assets/hq_lowwater.png","river_hamlet":"assets/hq_lowwater.png","river_camp":"assets/hq_lowwater.png","river_exit":"assets/hq_lowwater.png","broken_span":"assets/hq_broken_span_hounds.png","span_wave1":"assets/hq_broken_span_hounds.png","span_choice":"assets/hq_tone_beneath_bridge.png","span_final":"assets/hq_tone_beneath_bridge.png","after_span":"assets/hq_tone_beneath_bridge.png","hollowmere":"assets/hollowmere_ai.jpg","hollow_forge":"assets/hq_under_mountain.png","hollow_inn":"assets/hollowmere_ai.jpg","hollow_records":"assets/hollowmere_ai.jpg","mountain_departure":"assets/hq_mountain_pass.png","ridge1":"assets/hq_mountain_pass.png","ridge2":"assets/hq_mountain_pass.png","ridge3":"assets/hq_mountain_pass.png","tunnel1":"assets/hq_under_mountain.png","tunnel2":"assets/hq_under_mountain.png","tunnel3":"assets/hq_under_mountain.png","pass_reunion":"assets/hq_mountain_pass.png","final_view":"assets/final_ai.jpg"};
-const HERO_ASSET_VERSION='v142';
+const sceneImages={"intro":"assets/brackencliff_v12.webp","briefing":"assets/scene_briefing.webp","forge":"assets/scene_forge.webp","cliff_excavation":"assets/scene_cliff_excavation.webp","first_mile":"assets/first_mile_ai.webp","farmstead":"assets/scene_farmstead.webp","woodland_edge":"assets/hq_greywood_road.webp","pine_road":"assets/hq_greywood_road.webp","charcoal_camp":"assets/hq_charcoal_camp.webp","stag_stones":"assets/hq_stag_stones.webp","pine_camp":"assets/hq_pine_camp.webp","pine_descent":"assets/hq_pine_camp.webp","river_road":"assets/hq_river_road.webp","ferry_house":"assets/hq_river_road.webp","drowned_marker":"assets/hq_lowwater.webp","river_hamlet":"assets/hq_lowwater.webp","river_camp":"assets/hq_lowwater.webp","river_exit":"assets/hq_lowwater.webp","broken_span":"assets/hq_broken_span_hounds.webp","span_wave1":"assets/hq_broken_span_hounds.webp","span_choice":"assets/hq_tone_beneath_bridge.webp","span_final":"assets/hq_tone_beneath_bridge.webp","after_span":"assets/hq_tone_beneath_bridge.webp","hollowmere":"assets/hollowmere_ai.webp","hollow_forge":"assets/hq_under_mountain.webp","hollow_inn":"assets/hollowmere_ai.webp","hollow_records":"assets/hollowmere_ai.webp","mountain_departure":"assets/hq_mountain_pass.webp","ridge1":"assets/hq_mountain_pass.webp","ridge2":"assets/hq_mountain_pass.webp","ridge3":"assets/hq_mountain_pass.webp","tunnel1":"assets/hq_under_mountain.webp","tunnel2":"assets/hq_under_mountain.webp","tunnel3":"assets/hq_under_mountain.webp","pass_reunion":"assets/hq_mountain_pass.webp","final_view":"assets/final_ai.webp"};
+const HERO_ASSET_VERSION='v160';
 const heroAsset=(file)=>`/assets/${file}?${HERO_ASSET_VERSION}`;
-const portraitImages={Knight:['knight_1.jpg','knight_2.jpg','knight_3.jpg'],Ranger:['ranger_1.jpg','ranger_2.jpg','ranger_3.jpg'],Thief:['thief_1.jpg','thief_2.jpg','thief_3.jpg'],Mage:['mage_1.jpg','mage_2.jpg','mage_3.jpg'],Monk:['monk_1.jpg','monk_2.jpg','monk_3.jpg'],Engineer:['engineer_1.jpg','engineer_2.jpg','engineer_3.jpg']};
-const portraitFallbacks={Knight:'knight.jpg',Ranger:'ranger.jpg',Thief:'thief.jpg',Mage:'mage.jpg',Monk:'monk.jpg',Engineer:'engineer.jpg'};
+const portraitImages={Knight:['knight_1.webp','knight_2.webp','knight_3.webp'],Ranger:['ranger_1.webp','ranger_2.webp','ranger_3.webp'],Thief:['thief_1.webp','thief_2.webp','thief_3.webp'],Mage:['mage_1.webp','mage_2.webp','mage_3.webp'],Monk:['monk_1.webp','monk_2.webp','monk_3.webp'],Engineer:['engineer_1.webp','engineer_2.webp','engineer_3.webp']};
+const portraitFallbacks={Knight:'knight_1.webp',Ranger:'ranger_1.webp',Thief:'thief_1.webp',Mage:'mage_1.webp',Monk:'monk_1.webp',Engineer:'engineer_1.webp'};
 const portraitChoice={create:1,join:1};
-const portraitPath=(cls,n=1)=>heroAsset(portraitImages[cls]?.[Math.max(0,Math.min(2,Number(n||1)-1))]||portraitImages[cls]?.[0]||'portraits.jpg');
-const portraitFallback=(cls)=>heroAsset(portraitFallbacks[cls]||'portraits.jpg');
+const portraitPath=(cls,n=1)=>heroAsset(portraitImages[cls]?.[Math.max(0,Math.min(2,Number(n||1)-1))]||portraitImages[cls]?.[0]||'portraits.webp');
+const portraitFallback=(cls)=>heroAsset(portraitFallbacks[cls]||'portraits.webp');
 const portraitError=(cls)=>`this.onerror=null;this.src='${portraitFallback(cls)}'`;
 const npcInfo={
-"Mara":{"name":"Mara Vale","img":"assets/npc_mara_ai.jpg","tag":"Cartographer"},
-"Dain":{"name":"Dain Holt","img":"assets/npc_dain_ai.jpg","tag":"Road-captain"},
-"Ilyra":{"name":"Ilyra Sen","img":"assets/npc_ilyra_ai.jpg","tag":"Interpreter"},
-"Rook":{"name":"Cassian Rook","img":"assets/npc_rook_ai.jpg","tag":"Rival explorer"},
-"Rowan":{"name":"Rowan Marr","img":"assets/npc_rowan_ai.jpg","tag":"Brackencliff blacksmith"},
-"Sella":{"name":"Master Sella Vorr","img":"assets/npc_sella_ai.jpg","tag":"Hollowmere smith"},
-"Edda":{"name":"Edda Varn","img":"assets/ranger_3.jpg","tag":"Farmer at the last settled road"},
-"Beren":{"name":"Beren Quill","img":"assets/engineer_2.jpg","tag":"Charcoal burner"},
-"Innkeeper":{"name":"Innkeeper","img":"assets/knight_3.jpg","tag":"Lantern Inn keeper"},
-"Shepherd":{"name":"Shepherd","img":"assets/ranger_2.jpg","tag":"Mountain shepherd"},
-"Clerk":{"name":"Archive clerk","img":"assets/mage_3.jpg","tag":"Toll-house clerk"},
-"Elder":{"name":"Lowwater elder","img":"assets/monk_3.jpg","tag":"River hamlet elder"},
-"Scout":{"name":"Rook's scout","img":"assets/thief_2.jpg","tag":"Rook expedition scout"}
+"Mara":{"name":"Mara Vale","img":"assets/npc_mara_ai.webp","tag":"Cartographer"},
+"Dain":{"name":"Dain Holt","img":"assets/npc_dain_ai.webp","tag":"Road-captain"},
+"Ilyra":{"name":"Ilyra Sen","img":"assets/npc_ilyra_ai.webp","tag":"Interpreter"},
+"Rook":{"name":"Cassian Rook","img":"assets/npc_rook_ai.webp","tag":"Rival explorer"},
+"Rowan":{"name":"Rowan Marr","img":"assets/npc_rowan_ai.webp","tag":"Brackencliff blacksmith"},
+"Sella":{"name":"Master Sella Vorr","img":"assets/npc_sella_ai.webp","tag":"Hollowmere smith"},
+"Edda":{"name":"Edda Varn","img":"assets/ranger_3.webp","tag":"Farmer at the last settled road"},
+"Beren":{"name":"Beren Quill","img":"assets/engineer_2.webp","tag":"Charcoal burner"},
+"Innkeeper":{"name":"Innkeeper","img":"assets/knight_3.webp","tag":"Lantern Inn keeper"},
+"Shepherd":{"name":"Shepherd","img":"assets/ranger_2.webp","tag":"Mountain shepherd"},
+"Clerk":{"name":"Archive clerk","img":"assets/mage_3.webp","tag":"Toll-house clerk"},
+"Elder":{"name":"Lowwater elder","img":"assets/monk_3.webp","tag":"River hamlet elder"},
+"Scout":{"name":"Rook's scout","img":"assets/thief_2.webp","tag":"Rook expedition scout"}
 };
 let me=null,state=null,myStats=emptyStats(),roomCode='';
 let rollRequest=null;
@@ -266,7 +266,7 @@ Object.assign(scenes,{
     'For the first time since Brackencliff, nobody looks at the Road. Everyone looks at one another.'
   ],choices:[['hero','I will stay. Get the others across.','Sacrifice your hero for the company'],['pass','Ask the others — does someone else volunteer?','Pass the decision to the next hero'],['mara',"Accept Mara's offer",'Mara stays behind'],['dain','Let Dain take her place','Dain stays behind'],['rewrite','Use what you learned to rewrite the handoff','Hidden solution · everyone may live','flag','keeper_solution'],['improvise','Try to force another solution from the mechanism','Very hard · Craft / Knowledge / Spirit'],['sever','Destroy the receiver instead','No sacrifice · the Road is severed'],['retreat','Refuse the sacrifice and retreat while you can','No sacrifice · accept failure']]}
 });
-Object.assign(sceneImages,{final_view:'assets/receiver_assault_v13.jpg',receiver_threshold:'assets/receiver_assault_v13.jpg',receiver_assault:'assets/receiver_assault_v13.jpg',keeper_choice:'assets/keeper_chamber_v13.jpg'});
+Object.assign(sceneImages,{final_view:'assets/final_ai.webp',receiver_threshold:'assets/hq_under_mountain.webp',receiver_assault:'assets/hq_under_mountain.webp',keeper_choice:'assets/hq_under_mountain.webp'});
 Object.assign(sceneArt,{receiver_threshold:['⚔','The receiving span wakes'],receiver_assault:['⚔','The last twenty paces'],keeper_choice:['◈','Someone must hold the Road']});
 
 const worldMapConfig={"title":"The Glass Road — First Crossing","baseSvg":"<path class=\"map-road\" d=\"M7,66 C18,60 27,54 37,48 C49,42 57,40 67,34 C78,28 87,24 96,17\"/><path class=\"map-water\" d=\"M25,68 C34,58 39,55 43,46 C48,36 54,35 61,31\"/>","terrain":[{"type":"symbol","x":30,"y":35,"symbol":"♣"},{"type":"symbol","x":36,"y":31,"symbol":"♣"},{"type":"symbol","x":43,"y":33,"symbol":"♣"},{"type":"symbol","x":75,"y":22,"symbol":"▲"},{"type":"symbol","x":82,"y":18,"symbol":"▲"},{"type":"symbol","x":89,"y":15,"symbol":"▲"},{"type":"path","kind":"river","d":"M27,62 C37,57 41,52 47,46 C53,40 57,38 63,34"},{"type":"path","kind":"road","d":"M8,66 C24,59 36,50 49,44 C61,39 70,32 81,25 C87,21 92,19 97,17"}],"nodes":[{"id":"brackencliff","title":"Brackencliff","x":10,"y":66,"reveal":13,"scenes":["intro","briefing","forge","cliff_excavation","first_mile","farmstead"]},{"id":"greywood","title":"Greywood Fork","x":27,"y":52,"reveal":12,"scenes":["woodland_edge","pine_road","river_road"]},{"id":"pine","title":"High Pine Road","x":40,"y":34,"reveal":10,"scenes":["charcoal_camp","stag_stones","pine_camp","pine_descent"]},{"id":"river","title":"River Tern","x":42,"y":58,"reveal":10,"scenes":["ferry_house","drowned_marker","river_hamlet","river_camp","river_exit"]},{"id":"span","title":"Broken Span","x":61,"y":44,"reveal":13,"scenes":["broken_span","span_wave1","span_choice","span_final","after_span"]},{"id":"hollowmere","title":"Hollowmere","x":74,"y":36,"reveal":11,"scenes":["hollowmere","hollow_inn","hollow_forge","hollow_records"]},{"id":"pass","title":"Crown Pass","x":88,"y":20,"reveal":12,"scenes":["mountain_departure","ridge1","ridge2","ridge3","tunnel1","tunnel2","tunnel3","pass_reunion","final_view","receiver_threshold","receiver_assault","keeper_choice"]}]};
@@ -578,7 +578,7 @@ function renderEnding(){
   };
   const [title,lead]=endings[state.finalChoice]||['Beyond the Known Maps','The company returns knowing the Glass Road is awake and that the First Crossing changed them.'];
   document.querySelector('#ended h1').textContent=title;
-  $('endingArt').style.backgroundImage="linear-gradient(0deg,rgba(5,10,18,.72),rgba(5,10,18,.08)),url('assets/keeper_chamber_v13.jpg')";
+  $('endingArt').style.backgroundImage="linear-gradient(0deg,rgba(5,10,18,.72),rgba(5,10,18,.08)),url('assets/final_ai.webp')";
   const routeNames=(state.routeHistory||[]).filter(r=>r.complete).map(r=>r.name).filter(Boolean);
   const trusted=Object.values(state.journal?.people||{}).filter(p=>['trusting','confiding','cooperating','competitive respect','wary respect','open','respectful','trusted interpreter'].includes(String(p.status||'').toLowerCase())).map(p=>p.name);
   const remainingItems=(state.items||[]).map(id=>state.itemCatalog?.[id]?.name||id.replaceAll('_',' '));
@@ -736,7 +736,7 @@ function showSceneReveal(scene){
   overlay.classList.remove('hidden');overlay.classList.add('show');
   clearTimeout(showSceneReveal.t);showSceneReveal.t=setTimeout(()=>{overlay.classList.remove('show');setTimeout(()=>overlay.classList.add('hidden'),350);},2200);
 }
-function showSpotlight(kicker,title,text,image='assets/portraits.jpg',ms=2500){
+function showSpotlight(kicker,title,text,image='assets/portraits.webp',ms=2500){
   const overlay=$('sceneReveal'); if(!overlay)return;
   overlay.style.backgroundImage=`linear-gradient(rgba(3,8,15,.22),rgba(3,8,15,.82)),url('${image}')`;
   $('revealKicker').textContent=kicker;
