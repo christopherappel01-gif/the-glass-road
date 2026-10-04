@@ -54,3 +54,10 @@ This build adds:
 - battle-state UI for the Receiving Span
 
 The sacrifice is never mandatory: the party can refuse, sever the receiver, or potentially discover another way.
+## V1.4 Landing & Interaction Polish
+
+- Reworked the opening/load page to foreground the build’s distinctive features: persistent hero identity, private clues, consequential branching story, split-party play and built-in browser voice chat.
+- Increased cinematic image presence and improved opening-page hierarchy/readability across desktop, tablet and mobile.
+- Made integrated voice chat visible before players create or join a room, including ambience ducking as a highlighted feature.
+- Replaced the tiny dice-result dismiss hint with a large, accessible, panel-native close control.
+
