@@ -1,17 +1,17 @@
 {
   "name": "glass-road-first-crossing",
-  "version": "1.4.0",
+  "version": "1.4.2",
   "private": true,
-  "description": "GM-less cooperative fantasy RPG: The Glass Road — The First Crossing (V1.4 landing and interaction polish)",
+  "description": "GM-less cooperative fantasy RPG: The Glass Road \u2014 The First Crossing (V1.4.2 hero portrait asset fix)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.21.2",
-    "socket.io": "^4.8.1"
+    "express": "4.21.2",
+    "socket.io": "4.8.1"
   },
   "engines": {
-    "node": ">=18"
+    "node": "20.x"
   }
 }
