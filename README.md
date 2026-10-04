@@ -1,6 +1,6 @@
 # The Glass Road — The First Crossing
 
-**V1.7.1 — Simplified Animated Atmosphere Build**
+**V1.8.0 — Slow Cinematic Landing + Spotlight Fix Build**
 
 This build rolls all current fixes and visual upgrades into one clean playtest package.
 
@@ -48,8 +48,35 @@ Deploy on Render as a **Web Service**.
 - **Phase D:** animated class portrait gallery plus subtle portrait motion throughout the interface.
 
 
-## V1.7.1 refinements
+## V1.8.0 refinements
 
 - Simplified the landing page again by removing the extra cinematic-story and animated-hero promo sections.
 - Added an **actual looping animated hero image** for the main landing-page artwork.
 - Shifted the motion emphasis into the **story moments themselves** using atmospheric overlays: moving forest mist, soft tree sway, drifting mountain cloud, river haze, danger pulses, and settlement smoke/light.
+
+
+## V1.8.0 refinements
+
+- Replaced the quicker animated landing image with a **12-second muted looping video** with near-static framing, slow cloud drift and forest mist.
+- Removed the noticeable fast zoom-in / zoom-out effect from the landing presentation.
+- Fixed hero/reputation spotlight pop-ups (including **Trusted Voice**) so portrait artwork is displayed at a contained, screen-safe size instead of being blown up as a full-screen crop.
+
+
+## V1.8.0 major scene loops
+
+- Added **actual animated environment loops** for the main story moments rather than only overlay motion.
+- The major scenes now use dedicated animated WebP loops integrated directly into the story panel:
+  - Brackencliff / Discovery
+  - Pine Road
+  - Charcoal Camp
+  - Stag Stones
+  - River Road
+  - Lowwater
+  - Broken Span
+  - Tone Beneath the Bridge
+  - Hollowmere
+  - Mountain Pass
+  - Under the Mountain
+  - Final View
+- Kept the landing page simple and updated the landing animation to a slower, calmer loop.
+- Reduced the spotlight / Trusted Voice portrait scaling so those popups stay screen-safe.

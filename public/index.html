@@ -11,6 +11,10 @@
 <main id="app">
   <section id="home" class="screen home-screen">
     <div class="hero-banner hero-banner--opening">
+      <video class="hero-banner__video" autoplay muted loop playsinline preload="metadata" poster="assets/hq_landing_hero.webp" aria-hidden="true">
+        <source src="assets/hq_landing_hero_slow.webm" type="video/webm">
+        <source src="assets/hq_landing_hero_slow.mp4" type="video/mp4">
+      </video>
       <div class="hero-banner__overlay"></div>
       <div class="hero-banner__content hero-banner__content--wide">
         <div class="eyebrow">GM-LESS CO-OPERATIVE FANTASY RPG · 1–6 PLAYERS</div>
@@ -221,7 +225,7 @@
 
     <div class="game-grid">
       <section class="panel story-panel">
-        <div id="sceneArt" class="scene-art" role="img" aria-label="Story scene illustration"><div class="scene-art__fx scene-art__fx-a"></div><div class="scene-art__fx scene-art__fx-b"></div><div class="scene-art__icon"></div><div class="scene-art__caption"></div></div><div id="sceneKindBadge" class="scene-kind"></div><div id="passiveInsight" class="passive-insight hidden"></div><div id="itemCallback" class="item-callback hidden"></div><div id="battleState" class="battle-state hidden"></div><div id="npcMoment" class="npc-moment hidden"></div><div id="callbackPanel" class="callback-panel hidden"></div>
+        <div id="sceneArt" class="scene-art" role="img" aria-label="Story scene illustration"><img id="sceneArtMedia" class="scene-art__media hidden" alt="Scene illustration"><div class="scene-art__fx scene-art__fx-a"></div><div class="scene-art__fx scene-art__fx-b"></div><div class="scene-art__icon"></div><div class="scene-art__caption"></div></div><div id="sceneKindBadge" class="scene-kind"></div><div id="passiveInsight" class="passive-insight hidden"></div><div id="itemCallback" class="item-callback hidden"></div><div id="battleState" class="battle-state hidden"></div><div id="npcMoment" class="npc-moment hidden"></div><div id="callbackPanel" class="callback-panel hidden"></div>
         <div id="storyBridge" class="story-bridge hidden"></div>
         <div id="sceneText" class="story"></div>
         <div id="turnNotice" class="turn-notice"></div>

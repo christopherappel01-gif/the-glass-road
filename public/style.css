@@ -372,3 +372,24 @@ body .scene-art.receiver_threshold,body .scene-art.receiver_assault{min-height:4
 @keyframes roadSweep{0%{transform:translateX(-4%);opacity:.08}100%{transform:translateX(4%);opacity:.18}}
 
 @media(prefers-reduced-motion:reduce){.scene-art__fx,.home-screen .hero-banner--opening{animation:none!important}}
+
+
+/* --- V1.7.2 landing pacing + spotlight scaling fix --- */
+.home-screen .hero-banner--opening{background-image:url('assets/hq_landing_hero.webp')!important;overflow:hidden!important}
+.hero-banner__video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;z-index:0;pointer-events:none}
+.home-screen .hero-banner__overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(3,7,13,.90) 0%,rgba(3,7,13,.56) 42%,rgba(3,7,13,.18) 82%),linear-gradient(0deg,rgba(3,7,13,.72),rgba(3,7,13,.12) 48%,transparent 78%)}
+.home-screen .hero-banner__content{position:relative;z-index:2}
+
+/* Achievement / reputation spotlights use portraits as portraits, not full-screen crops. */
+.scene-reveal.spotlight-portrait{background-color:#060b13!important;background-size:min(34vw,320px) auto!important;background-repeat:no-repeat!important;background-position:center 11%!important}
+.scene-reveal.spotlight-portrait:after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at center 25%,transparent 0 22%,rgba(4,8,14,.18) 42%,rgba(4,8,14,.78) 76%,rgba(4,8,14,.96) 100%);z-index:0}
+.scene-reveal.spotlight-portrait .scene-reveal__content{position:relative;z-index:1;width:min(700px,calc(100% - 24px));margin-bottom:2vh}
+@media(max-width:700px){.scene-reveal.spotlight-portrait{background-size:min(56vw,260px) auto!important;background-position:center 8%!important}.scene-reveal.spotlight-portrait .scene-reveal__content{padding:16px}}
+
+
+/* V1.8 major scene media */
+.scene-art__media{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:0}
+.scene-art__media.hidden{display:none!important}
+.scene-art.has-media{background-size:100% 100%,cover!important;background-position:center,center!important}
+.scene-art.has-media .scene-art__fx{z-index:2}
+.scene-art.has-media .scene-art__icon,.scene-art.has-media .scene-art__caption{z-index:3}
