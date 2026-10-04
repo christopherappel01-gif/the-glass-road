@@ -381,10 +381,6 @@ body .scene-art.receiver_threshold,body .scene-art.receiver_assault{min-height:4
 .home-screen .hero-banner__content{position:relative;z-index:2}
 
 /* Achievement / reputation spotlights use portraits as portraits, not full-screen crops. */
-.scene-reveal.spotlight-portrait{background-color:#060b13!important;background-size:min(34vw,320px) auto!important;background-repeat:no-repeat!important;background-position:center 11%!important}
-.scene-reveal.spotlight-portrait:after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at center 25%,transparent 0 22%,rgba(4,8,14,.18) 42%,rgba(4,8,14,.78) 76%,rgba(4,8,14,.96) 100%);z-index:0}
-.scene-reveal.spotlight-portrait .scene-reveal__content{position:relative;z-index:1;width:min(700px,calc(100% - 24px));margin-bottom:2vh}
-@media(max-width:700px){.scene-reveal.spotlight-portrait{background-size:min(56vw,260px) auto!important;background-position:center 8%!important}.scene-reveal.spotlight-portrait .scene-reveal__content{padding:16px}}
 
 
 /* V1.8 major scene media */
@@ -393,3 +389,13 @@ body .scene-art.receiver_threshold,body .scene-art.receiver_assault{min-height:4
 .scene-art.has-media{background-size:100% 100%,cover!important;background-position:center,center!important}
 .scene-art.has-media .scene-art__fx{z-index:2}
 .scene-art.has-media .scene-art__icon,.scene-art.has-media .scene-art__caption{z-index:3}
+
+
+/* V1.8.1 spotlight portrait containment */
+.scene-reveal.spotlight-portrait{background-color:#060b13!important;background-image:linear-gradient(rgba(3,8,15,.24),rgba(3,8,15,.90))!important;background-size:cover!important;background-repeat:no-repeat!important;background-position:center!important;padding-top:calc(18vh + 180px)!important}
+.scene-reveal__portrait{position:absolute;top:7vh;left:50%;transform:translateX(-50%);width:min(28vw,260px);max-width:70vw;max-height:32vh;object-fit:contain;display:block;z-index:2;border-radius:16px;border:1px solid rgba(240,201,109,.34);box-shadow:0 18px 36px rgba(0,0,0,.38);background:rgba(5,10,18,.22)}
+.scene-reveal__portrait.hidden{display:none!important}
+.scene-reveal.spotlight-portrait:after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at center 21%,rgba(255,255,255,.02) 0 14%,rgba(4,8,14,.16) 32%,rgba(4,8,14,.74) 70%,rgba(4,8,14,.96) 100%);z-index:0}
+.scene-reveal.spotlight-portrait .scene-reveal__content{position:relative;z-index:3;width:min(700px,calc(100% - 24px));margin-bottom:2vh}
+@media(max-width:900px){.scene-reveal__portrait{width:min(38vw,240px);max-height:28vh}.scene-reveal.spotlight-portrait{padding-top:calc(14vh + 160px)!important}}
+@media(max-width:700px){.scene-reveal__portrait{width:min(56vw,220px);max-height:24vh;top:5vh}.scene-reveal.spotlight-portrait{padding-top:calc(12vh + 130px)!important}.scene-reveal.spotlight-portrait .scene-reveal__content{padding:16px}}
