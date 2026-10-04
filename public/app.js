@@ -11,7 +11,7 @@ const classInfo = {
   Engineer:{icon:'⚙️',gift:'Improviser — gains +1 to Craft checks; invaluable with mechanisms, repairs and construction.',fav:['Craft','Knowledge','Strength'],build:{Strength:3,Agility:1,Endurance:2,Awareness:2,Survival:1,Stealth:0,Knowledge:4,Craft:5,Influence:1,Spirit:1}}
 };
 const sceneArt={"intro":["◈","Brackencliff After the Quake"],"briefing":["◈","The Expedition Table"],"forge":["◈","The Forge Before the Road"],"cliff_excavation":["◈","The First Exposed Mile"],"first_mile":["◈","The Road Under the Fields"],"farmstead":["◈","The Last Farm"],"woodland_edge":["◈","Where the Old Maps End"],"pine_road":["♣","Under the High Pines"],"charcoal_camp":["♣","The Charcoal Burner's Camp"],"stag_stones":["♣","The Stag Stones"],"pine_camp":["♣","Camp Above the Tern"],"pine_descent":["♣","The Long Descent"],"river_road":["≋","Along the River Tern"],"ferry_house":["≋","The Empty Ferry House"],"drowned_marker":["≋","The Drowned Marker"],"river_hamlet":["≋","Three Houses at Lowwater"],"river_camp":["≋","Rain at Lowwater"],"river_exit":["≋","The Flooded Approach"],"broken_span":["⚔","The Broken Span"],"span_wave1":["⚔","Glass Hounds"],"span_choice":["⚔","The Bridge Turns"],"span_final":["⚔","The Tone Beneath the Bridge"],"after_span":["⚔","Two Expeditions, One Road"],"hollowmere":["⌂","Hollowmere"],"hollow_forge":["⌂","The Mountain Forge"],"hollow_inn":["⌂","The Lantern Inn"],"hollow_records":["⌂","The Toll-House Archive"],"mountain_departure":["▲","Leaving Hollowmere"],"ridge1":["▲","The Wind Stair"],"ridge2":["▲","The Bell Cairn"],"ridge3":["▲","The White Ledge"],"tunnel1":["▲","The Maintenance Door"],"tunnel2":["▲","The Water Galleries"],"tunnel3":["▲","The Closed Chamber"],"pass_reunion":["▲","The First Crossing"],"final_view":["✧","Beyond the Known Maps"]};
-const sceneImages={"intro":"assets/brackencliff_v12.jpg","briefing":"assets/scene_briefing.jpg","forge":"assets/scene_forge.jpg","cliff_excavation":"assets/scene_cliff_excavation.jpg","first_mile":"assets/first_mile_ai.jpg","farmstead":"assets/scene_farmstead.jpg","woodland_edge":"assets/greywood_ai.jpg","pine_road":"assets/scene_pine_road.jpg","charcoal_camp":"assets/scene_charcoal_camp.jpg","stag_stones":"assets/scene_stag_stones.jpg","pine_camp":"assets/scene_pine_camp.jpg","pine_descent":"assets/scene_pine_descent.jpg","river_road":"assets/river_ai.jpg","ferry_house":"assets/scene_ferry_house.jpg","drowned_marker":"assets/scene_drowned_marker.jpg","river_hamlet":"assets/scene_river_hamlet.jpg","river_camp":"assets/scene_river_camp.jpg","river_exit":"assets/scene_river_exit.jpg","broken_span":"assets/span_ai.jpg","span_wave1":"assets/scene_span_wave1.jpg","span_choice":"assets/scene_span_choice.jpg","span_final":"assets/scene_span_final.jpg","after_span":"assets/scene_after_span.jpg","hollowmere":"assets/hollowmere_ai.jpg","hollow_forge":"assets/scene_hollow_forge.jpg","hollow_inn":"assets/scene_hollow_inn.jpg","hollow_records":"assets/scene_hollow_records.jpg","mountain_departure":"assets/mountain_ai.jpg","ridge1":"assets/scene_ridge1.jpg","ridge2":"assets/scene_ridge2.jpg","ridge3":"assets/scene_ridge3.jpg","tunnel1":"assets/scene_tunnel1.jpg","tunnel2":"assets/scene_tunnel2.jpg","tunnel3":"assets/scene_tunnel3.jpg","pass_reunion":"assets/scene_pass_reunion.jpg","final_view":"assets/final_ai.jpg"};
+const sceneImages={"intro":"assets/brackencliff_v12.jpg","briefing":"assets/scene_briefing.jpg","forge":"assets/scene_forge.jpg","cliff_excavation":"assets/scene_cliff_excavation.jpg","first_mile":"assets/first_mile_ai.jpg","farmstead":"assets/scene_farmstead.jpg","woodland_edge":"assets/hq_greywood_road.png","pine_road":"assets/hq_greywood_road.png","charcoal_camp":"assets/hq_charcoal_camp.png","stag_stones":"assets/hq_stag_stones.png","pine_camp":"assets/hq_pine_camp.png","pine_descent":"assets/hq_pine_camp.png","river_road":"assets/hq_river_road.png","ferry_house":"assets/hq_river_road.png","drowned_marker":"assets/hq_lowwater.png","river_hamlet":"assets/hq_lowwater.png","river_camp":"assets/hq_lowwater.png","river_exit":"assets/hq_lowwater.png","broken_span":"assets/hq_broken_span_hounds.png","span_wave1":"assets/hq_broken_span_hounds.png","span_choice":"assets/hq_tone_beneath_bridge.png","span_final":"assets/hq_tone_beneath_bridge.png","after_span":"assets/hq_tone_beneath_bridge.png","hollowmere":"assets/hollowmere_ai.jpg","hollow_forge":"assets/hq_under_mountain.png","hollow_inn":"assets/hollowmere_ai.jpg","hollow_records":"assets/hollowmere_ai.jpg","mountain_departure":"assets/hq_mountain_pass.png","ridge1":"assets/hq_mountain_pass.png","ridge2":"assets/hq_mountain_pass.png","ridge3":"assets/hq_mountain_pass.png","tunnel1":"assets/hq_under_mountain.png","tunnel2":"assets/hq_under_mountain.png","tunnel3":"assets/hq_under_mountain.png","pass_reunion":"assets/hq_mountain_pass.png","final_view":"assets/final_ai.jpg"};
 const HERO_ASSET_VERSION='v142';
 const heroAsset=(file)=>`/assets/${file}?${HERO_ASSET_VERSION}`;
 const portraitImages={Knight:['knight_1.jpg','knight_2.jpg','knight_3.jpg'],Ranger:['ranger_1.jpg','ranger_2.jpg','ranger_3.jpg'],Thief:['thief_1.jpg','thief_2.jpg','thief_3.jpg'],Mage:['mage_1.jpg','mage_2.jpg','mage_3.jpg'],Monk:['monk_1.jpg','monk_2.jpg','monk_3.jpg'],Engineer:['engineer_1.jpg','engineer_2.jpg','engineer_3.jpg']};
@@ -67,37 +67,46 @@ function clearRollRequest(){
 }
 function sendChallengeRoll(payload,button){
   if(!state?.pending)return showError('That challenge is no longer active.');
-  if(rollRequest)return;
+  if(!socket.connected)return showConsequence('Connection interrupted','The game is reconnecting. Wait a moment, then roll again. Your turn is safe.','bad');
   const challengeId=state.pending.challengeId||null;
+  if(rollRequest){
+    if(rollRequest.challengeId===challengeId)return showConsequence('Roll already in progress','The server is still resolving this roll. If it does not finish, the button will unlock automatically.','good');
+    clearRollRequest();
+  }
   const original=button?.textContent||'🎲 Roll the Dice';
-  if(button){button.disabled=true;button.textContent='🎲 Rolling…';}
+  if(button){button.disabled=true;button.dataset.rollPending='1';button.textContent='🎲 Sending roll…';}
   let finished=false;
   const recover=(message)=>{
     if(finished)return;
     finished=true;
-    if(rollRequest?.timer)clearTimeout(rollRequest.timer);
-    rollRequest=null;
-    if(button){button.disabled=false;button.textContent='🎲 Retry Roll';}
+    const activeButton=rollRequest?.button||button;
+    clearRollRequest();
+    if(activeButton&&document.body.contains(activeButton)){activeButton.disabled=false;activeButton.dataset.rollPending='';activeButton.textContent='🎲 Retry Roll';}
     showConsequence('Roll did not resolve',message||'The server did not confirm the roll. Your turn is still safe — try the roll again.','bad');
   };
-  const timer=setTimeout(()=>recover('No response arrived from the server. Your challenge has not been skipped or failed; press Retry Roll.'),6500);
-  rollRequest={challengeId,timer,button,original};
-  socket.emit('rollChallenge',{...payload,challengeId},ack=>{
+  const timer=setTimeout(()=>recover('No response arrived from the server. Your challenge has not been skipped or failed; press Retry Roll.'),9000);
+  rollRequest={challengeId,timer,button,original,startedAt:Date.now()};
+  socket.timeout(8000).emit('rollChallenge',{...payload,challengeId},(err,ack)=>{
     if(finished)return;
+    if(err)return recover('The connection did not acknowledge the roll. Your challenge is still active; press Retry Roll.');
     if(!ack?.ok){
-      clearTimeout(timer);finished=true;rollRequest=null;
-      if(button){button.disabled=false;button.textContent='🎲 Retry Roll';}
+      clearTimeout(timer);finished=true;
+      const activeButton=rollRequest?.button||button;clearRollRequest();
+      if(activeButton&&document.body.contains(activeButton)){activeButton.disabled=false;activeButton.dataset.rollPending='';activeButton.textContent='🎲 Retry Roll';}
       showError(ack?.message||'The roll could not be resolved. Please try again.');
       return;
     }
-    if(button)button.textContent='🎲 Resolving…';
-    rollRequest.followup=setTimeout(()=>{
-      if(rollRequest&&state?.pending?.challengeId===challengeId&&!state?.pending?.failed){
-        const b=rollRequest.button;clearRollRequest();
-        if(b){b.disabled=false;b.textContent='🎲 Retry Roll';}
-        showConsequence('Roll received, scene still waiting','The server received the roll but the scene did not advance. Retry once; duplicate requests are safely rejected.','bad');
-      }
-    },3000);
+    const req=rollRequest;
+    if(req?.challengeId===challengeId&&req.button&&document.body.contains(req.button))req.button.textContent='🎲 Resolving…';
+    if(req?.challengeId===challengeId){
+      req.followup=setTimeout(()=>{
+        if(rollRequest?.challengeId===challengeId&&state?.pending?.challengeId===challengeId&&!state?.pending?.failed){
+          const b=rollRequest.button;clearRollRequest();
+          if(b&&document.body.contains(b)){b.disabled=false;b.dataset.rollPending='';b.textContent='🎲 Retry Roll';}
+          showConsequence('Roll received, scene still waiting','The server received the roll but the scene did not advance. Retry once; duplicate requests are safely rejected.','bad');
+        }
+      },3500);
+    }
   });
 }
 
@@ -173,6 +182,8 @@ document.querySelectorAll('.menuBtn').forEach(b=>b.addEventListener('click',()=>
 socket.on('leftRoomView',()=>{show('home');refreshSavedCampaignUI();});
 
 socket.on('errorMsg',showError);
+socket.on('rollStarted',x=>{if(rollRequest&&(!x?.challengeId||x.challengeId===rollRequest.challengeId)){const b=rollRequest.button;if(b&&document.body.contains(b))b.textContent='🎲 Rolling…';}});
+socket.on('disconnect',()=>{if(rollRequest){clearRollRequest();showConsequence('Connection interrupted','The roll control has been reset. When the connection returns, you can safely try again.','bad');}});
 socket.on('connect',()=>{
   refreshSavedCampaignUI();
   if(!autoResumeTried&&sessionInfo?.roomCode&&sessionInfo?.resumeToken){autoResumeTried=true;socket.emit('resumeRoom',{roomCode:sessionInfo.roomCode,resumeToken:sessionInfo.resumeToken});}
@@ -182,7 +193,7 @@ function acceptIdentity(x,resetStats=false){me=x.playerId;roomCode=x.roomCode;st
 socket.on('joined',x=>{acceptIdentity(x,true);show('lobby');});
 socket.on('resumed',x=>{acceptIdentity(x,false);setTimeout(()=>{if(state?.phase==='playing')showConsequence('Welcome back',`You rejoin the company at ${scenes[state.scene]?.title||'the current scene'}. Tap Recap for the last few events.`, 'good');},650);});
 socket.on('campaignSave',x=>{campaignSave=x;writeJson('glassRoadCampaign',x);refreshSavedCampaignUI();if($('saveStatus'))$('saveStatus').textContent=`✓ Auto-saved · ${new Date(x.updatedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;});
-socket.on('secret',x=>{const box=$('secret');box.innerHTML=`<b>🔒 Private ${esc(x.title||'insight')}</b><br>${esc(x.text)}<div class="small muted" style="margin-top:6px">Only your character receives this clue. It has been saved in your Hero sheet.</div>`;box.classList.remove('hidden');const key=`${x.title||'insight'}|${x.text}`;if(!privateClues.some(c=>c.key===key)){privateClues.unshift({key,title:x.title||'Private insight',text:x.text,seenAt:Date.now()});privateClues=privateClues.slice(0,20);savePrivateClues();}clearTimeout(socket._secretTimer);socket._secretTimer=setTimeout(()=>box.classList.add('hidden'),16000);if($('heroSheetModal')&&!$('heroSheetModal').classList.contains('hidden'))renderHeroSheet();});
+socket.on('secret',x=>{const box=$('secret');box.innerHTML=`<button class="hint-dismiss-button" type="button" aria-label="Close private insight" title="Close private insight"><span aria-hidden="true">×</span></button><b>🔒 Private ${esc(x.title||'insight')}</b><br>${esc(x.text)}<div class="small muted" style="margin-top:6px">Only your character receives this clue. It has been saved in your Hero sheet.</div>`;box.classList.remove('hidden');box.querySelector('.hint-dismiss-button')?.addEventListener('click',()=>box.classList.add('hidden'));const key=`${x.title||'insight'}|${x.text}`;if(!privateClues.some(c=>c.key===key)){privateClues.unshift({key,title:x.title||'Private insight',text:x.text,seenAt:Date.now()});privateClues=privateClues.slice(0,20);savePrivateClues();}if($('heroSheetModal')&&!$('heroSheetModal').classList.contains('hidden'))renderHeroSheet();});
 socket.on('state',s=>{
   const old=state;
   if(rollRequest){
@@ -507,25 +518,26 @@ function renderChallenge(mine){
       const role=p.teamRoles?.[i],roleSkills=role?.skills||skills,chosenHero=defaultHeroes[i]||state.players[0];
       rows+=`<div class="team-role-card" data-team-index="${i}"><div class="team-role-card__title">${esc(role?.name||('Hero '+(i+1)))}</div><div class="team-role-card__desc small muted">${esc(role?.desc||'Choose the hero best suited to this part of the crisis.')}</div><div class="form-grid"><label>Hero<select class="teamHero">${groupHeroes.map((x,j)=>`<option value="${x.id}" ${j===i?'selected':''}>${esc(x.name)} — ${x.cls}</option>`).join('')}</select></label><label>Skill<select class="teamSkill">${skillOptions(roleSkills[0],roleSkills,chosenHero)}</select></label></div><div class="team-role-stats small muted">${chosenHero?`Relevant skills: ${esc(relevantSkillSummary(chosenHero,roleSkills))}`:''}</div></div>`;
     }
-    box.innerHTML=`<div class="challenge-box"><span class="mode">TEAM CHALLENGE</span><h3>${esc(p.desc)}</h3><div class="challenge-explain"><b>Why together?</b> ${esc(p.reason||'This problem needs several heroes acting at the same time.')}</div><p>Assign ${count} different roles. Each selected hero rolls <b>1D6 + one listed skill</b> against ${p.effectiveMemberDifficulty||p.memberDifficulty} (${difficultyName(p.effectiveMemberDifficulty||p.memberDifficulty)}). ${count===1?'1 success = success.':count===2?'2 successes = full success · 1 = partial success · 0 = setback.':'3 successes = full success · 2 = partial success · 0–1 = setback.'}${p.knowledgeNote?` <span class="knowledge-help">📖 ${esc(p.knowledgeNote)}</span>`:''}${(p.effectiveMemberDifficulty||p.memberDifficulty)>p.memberDifficulty?' <span class="threat-warning">Threat has made this dangerous challenge harder.</span>':''}</p><div class="team-role-grid">${rows}</div><button id="teamRoll" class="btn btn-primary full">🎲 Resolve the Team Challenge</button></div>`;
+    box.innerHTML=`<div class="challenge-box"><span class="mode">TEAM CHALLENGE</span><h3>${esc(p.desc)}</h3><div class="challenge-explain"><b>Why together?</b> ${esc(p.reason||'This problem needs several heroes acting at the same time.')}</div><p>Assign ${count} different roles. Each selected hero rolls <b>1D6 + one listed skill</b> against ${p.effectiveMemberDifficulty||p.memberDifficulty} (${difficultyName(p.effectiveMemberDifficulty||p.memberDifficulty)}). ${count===1?'1 success = success.':count===2?'2 successes = full success · 1 = partial success · 0 = setback.':'3 successes = full success · 2 = partial success · 0–1 = setback.'}${p.knowledgeNote?` <span class="knowledge-help">📖 ${esc(p.knowledgeNote)}</span>`:''}${(p.effectiveMemberDifficulty||p.memberDifficulty)>p.memberDifficulty?' <span class="threat-warning">Threat has made this dangerous challenge harder.</span>':''}</p><div class="team-role-grid">${rows}</div><button id="teamRoll" type="button" class="btn btn-primary full">🎲 Resolve the Team Challenge</button></div>`;
     [...box.querySelectorAll('.team-role-card')].forEach((card,i)=>{
       const h=card.querySelector('.teamHero'),s=card.querySelector('.teamSkill'),stats=card.querySelector('.team-role-stats'),role=p.teamRoles?.[i],allowed=role?.skills||skills;
       const update=()=>{const hero=groupHeroes.find(x=>x.id===h.value)||groupHeroes[0];s.innerHTML=skillOptions(allowed[0],allowed,hero);stats.textContent=`Relevant skills: ${relevantSkillSummary(hero,allowed)}`;};
       h.onchange=update;
     });
-    $('teamRoll').onclick=()=>{const hs=[...document.querySelectorAll('.teamHero')],ss=[...document.querySelectorAll('.teamSkill')];const team=hs.map((h,i)=>({playerId:h.value,skill:ss[i].value}));sendChallengeRoll({team},$('teamRoll'));};return;
+    $('teamRoll').onclick=()=>{const hs=[...document.querySelectorAll('.teamHero')],ss=[...document.querySelectorAll('.teamSkill')];const team=hs.map((h,i)=>({playerId:h.value,skill:ss[i].value}));sendChallengeRoll({team},$('teamRoll'));};if(rollRequest?.challengeId===p.challengeId){$('teamRoll').disabled=true;$('teamRoll').dataset.rollPending='1';$('teamRoll').textContent='🎲 Rolling…';rollRequest.button=$('teamRoll');}return;
   }
   const supportEligible=groupHeroes.filter(x=>x.id!==me&&x.supportReady);const support=p.type==='support',meHero=player();const rep=earnedReputationTitle(meHero),repMatch=rep&&Number(meHero?.reputation?.[rep.key]||0)>=3;const seasonedNote=(Number(meHero?.stats?.[p.recommended]||0)>=6?`<div class="knowledge-help">✦ Mastery: ${esc(p.recommended)} has become one of ${esc(meHero.name)}’s defining strengths. Choosing it rolls with Advantage.</div>`:'')+(repMatch?`<div class="knowledge-help">✦ Earned role: the company knows ${esc(meHero.name)} as <b>${esc(rep.title)}</b>. Checks that fit that role gain +1.</div>`:'');
   const helperOptions=supportEligible.map(x=>`<option value="${x.id}">${esc(x.name)} — ${x.cls} · ${esc(relevantSkillSummary(x,p.supportSkills))}</option>`).join('');
   if(p.lowStakes){
     const allowed=p.allowedSkills||[p.recommended];
     const successText=p.outcomeText?`You discover that ${esc(p.outcomeText)}.`:'You notice something useful that may change the route ahead.';
-    box.innerHTML=`<div class="challenge-box sense-box"><span class="mode">SENSE CHECK</span><h3>${esc(p.desc)}</h3><p class="sense-intro">Look carefully for anything useful before moving on.</p><div class="sense-summary"><div><span class="small muted">TARGET</span><strong>${p.effectiveDifficulty||p.difficulty}</strong></div><div><span class="small muted">USE</span><strong>${allowed.map(sk=>`${esc(sk)} — ${Number(meHero?.stats?.[sk]||0)}`).join(' or ')}</strong></div></div><div class="sense-outcomes"><div class="sense-good"><b>If you succeed</b><span>${successText}</span></div><div class="sense-neutral"><b>If you miss</b><span>You do not notice anything useful and the journey continues.</span></div></div><label>Choose skill<select id="mainSkill">${skillOptions(p.recommended,p.allowedSkills,meHero)}</select></label><button id="mainRoll" class="btn btn-primary full">🎲 Roll the Dice</button></div>`;
+    box.innerHTML=`<div class="challenge-box sense-box"><span class="mode">SENSE CHECK</span><h3>${esc(p.desc)}</h3><p class="sense-intro">Look carefully for anything useful before moving on.</p><div class="sense-summary"><div><span class="small muted">TARGET</span><strong>${p.effectiveDifficulty||p.difficulty}</strong></div><div><span class="small muted">USE</span><strong>${allowed.map(sk=>`${esc(sk)} — ${Number(meHero?.stats?.[sk]||0)}`).join(' or ')}</strong></div></div><div class="sense-outcomes"><div class="sense-good"><b>If you succeed</b><span>${successText}</span></div><div class="sense-neutral"><b>If you miss</b><span>You do not notice anything useful and the journey continues.</span></div></div><label>Choose skill<select id="mainSkill">${skillOptions(p.recommended,p.allowedSkills,meHero)}</select></label><button id="mainRoll" type="button" class="btn btn-primary full">🎲 Roll the Dice</button></div>`;
   } else {
-    box.innerHTML=`<div class="challenge-box"><span class="mode">${support?'SUPPORT AVAILABLE':'SOLO CHALLENGE'}</span><h3>${esc(p.desc)}</h3>${p.reason?`<div class="challenge-explain">${esc(p.reason)}</div>`:''}${seasonedNote}<p><b>Target:</b> ${p.effectiveDifficulty||p.difficulty} (${difficultyName(p.effectiveDifficulty||p.difficulty)}). <b>Use:</b> ${(p.allowedSkills||[p.recommended]).join(' or ')}.${support?` A helper may Support; their roll needs <b>${p.supportTarget||6}</b>+ to add +2.`:''}${p.knowledgeNote?` <span class="knowledge-help">📖 ${esc(p.knowledgeNote)}</span>`:''}${(p.effectiveDifficulty||p.difficulty)>p.difficulty?' <span class="threat-warning">Threat has made this challenge harder.</span>':''}</p><div class="form-grid"><label>Your skill<select id="mainSkill">${skillOptions(p.recommended,p.allowedSkills,meHero)}</select></label>${support?`<label>Optional helper<select id="supportPlayer"><option value="">Roll alone</option>${helperOptions}</select></label>`:''}</div>${support?`<div id="supportSkillWrap" class="hidden"><label>Helper's skill<select id="supportSkill"></select></label><p id="supportSkillHint" class="small muted">Choose a helper to see their relevant skill ratings.</p></div>`:''}<button id="mainRoll" class="btn btn-primary full">🎲 Roll the Dice</button></div>`;
+    box.innerHTML=`<div class="challenge-box"><span class="mode">${support?'SUPPORT AVAILABLE':'SOLO CHALLENGE'}</span><h3>${esc(p.desc)}</h3>${p.reason?`<div class="challenge-explain">${esc(p.reason)}</div>`:''}${seasonedNote}<p><b>Target:</b> ${p.effectiveDifficulty||p.difficulty} (${difficultyName(p.effectiveDifficulty||p.difficulty)}). <b>Use:</b> ${(p.allowedSkills||[p.recommended]).join(' or ')}.${support?` A helper may Support; their roll needs <b>${p.supportTarget||6}</b>+ to add +2.`:''}${p.knowledgeNote?` <span class="knowledge-help">📖 ${esc(p.knowledgeNote)}</span>`:''}${(p.effectiveDifficulty||p.difficulty)>p.difficulty?' <span class="threat-warning">Threat has made this challenge harder.</span>':''}</p><div class="form-grid"><label>Your skill<select id="mainSkill">${skillOptions(p.recommended,p.allowedSkills,meHero)}</select></label>${support?`<label>Optional helper<select id="supportPlayer"><option value="">Roll alone</option>${helperOptions}</select></label>`:''}</div>${support?`<div id="supportSkillWrap" class="hidden"><label>Helper's skill<select id="supportSkill"></select></label><p id="supportSkillHint" class="small muted">Choose a helper to see their relevant skill ratings.</p></div>`:''}<button id="mainRoll" type="button" class="btn btn-primary full">🎲 Roll the Dice</button></div>`;
   }
   if(support&&$('supportPlayer'))$('supportPlayer').onchange=()=>{const id=$('supportPlayer').value,wrap=$('supportSkillWrap');wrap.classList.toggle('hidden',!id);if(id){const h=groupHeroes.find(x=>x.id===id);$('supportSkill').innerHTML=skillOptions((p.supportSkills||[])[0],p.supportSkills,h);$('supportSkillHint').textContent=`${h.name}: ${relevantSkillSummary(h,p.supportSkills)}. A total of ${p.supportTarget||6}+ adds +2 to the main roll.`;}};
   $('mainRoll').onclick=()=>sendChallengeRoll({skill:$('mainSkill').value,supportPlayerId:support&&$('supportPlayer').value||null,supportSkill:support&&$('supportSkill')?.value||null},$('mainRoll'));
+  if(rollRequest?.challengeId===p.challengeId){$('mainRoll').disabled=true;$('mainRoll').dataset.rollPending='1';$('mainRoll').textContent='🎲 Rolling…';rollRequest.button=$('mainRoll');}
 }
 function renderLastRoll(){
   const r=state.lastRoll;if(!r){$('rollResult').innerHTML='';return;}
@@ -735,8 +747,8 @@ function showSpotlight(kicker,title,text,image='assets/portraits.jpg',ms=2500){
 }
 function showConsequence(title,text,type='good'){
   const box=$('consequenceToast');if(!box)return;
-  box.className=`consequence-toast ${type}`;box.innerHTML=`<b>${title}</b><span>${text}</span>`;box.classList.remove('hidden');
-  clearTimeout(showConsequence.t);showConsequence.t=setTimeout(()=>box.classList.add('hidden'),4200);
+  box.className=`consequence-toast ${type}`;box.innerHTML=`<button class="hint-dismiss-button toast-dismiss" type="button" aria-label="Close notification" title="Close notification"><span aria-hidden="true">×</span></button><b>${esc(title)}</b><span>${esc(text)}</span>`;box.classList.remove('hidden');
+  box.querySelector('.hint-dismiss-button')?.addEventListener('click',()=>box.classList.add('hidden'));
 }
 function handleAtmosphere(oldS,newS){
   if(oldS.phase!=='playing'&&newS.phase==='playing')setTimeout(()=>showSceneReveal(newS.scene),120);
