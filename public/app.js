@@ -20,6 +20,25 @@ const portraitChoice={create:1,join:1};
 const portraitPath=(cls,n=1)=>heroAsset(portraitImages[cls]?.[Math.max(0,Math.min(2,Number(n||1)-1))]||portraitImages[cls]?.[0]||'portraits.webp');
 const portraitFallback=(cls)=>heroAsset(portraitFallbacks[cls]||'portraits.webp');
 const portraitError=(cls)=>`this.onerror=null;this.src='${portraitFallback(cls)}'`;
+
+const flagshipBeats=[
+  {id:'intro',scene:'intro',title:'Brackencliff',text:'The Glass Road is uncovered beneath a shattered frontier city.'},
+  {id:'pines',scene:'pine_road',title:'The Road Through the Pines',text:'The expedition leaves the mapped world and follows the dark road into older country.'},
+  {id:'lowwater',scene:'river_road',title:'River Tern & Lowwater',text:'Rain, river mist and worn settlements test the company’s resolve.'},
+  {id:'span',scene:'broken_span',title:'Broken Span',text:'The Road answers back. Glass Hounds and a living bridge force a true crisis.'},
+  {id:'hollowmere',scene:'hollowmere',title:'Hollowmere',text:'A mountain town of docks, lamps and hidden records deepens the mystery.'},
+  {id:'pass',scene:'mountain_departure',title:'Crown Pass',text:'Ancient systems wake beneath the mountains as the route climbs toward revelation.'},
+  {id:'finale',scene:'final_view',title:'Beyond the Known Maps',text:'The distant promise of the First Crossing glows beyond the last ascent.'}
+];
+const flagshipClassNotes={Knight:'Hold the line and protect the company.',Ranger:'Track, scout and survive beyond the maps.',Thief:'Infiltrate, improvise and find unseen paths.',Mage:'Read the Road, its symbols and its power.',Monk:'Steady the party with resolve and healing.',Engineer:'Repair, improvise and master old mechanisms.'};
+let flagshipMontageIndex=0,flagshipMontageTimer=null,flagshipClassTimer=null;
+function sceneMotionClass(scene){if(/^(broken_span|span_wave1|span_choice|span_final|after_span|receiver_threshold|receiver_assault|keeper_choice)$/.test(scene))return 'scene-motion-danger';if(/^(hollowmere|hollow_inn|hollow_forge|hollow_records|intro|briefing|forge|cliff_excavation|first_mile|farmstead)$/.test(scene))return 'scene-motion-settlement';if(/^(mountain_departure|ridge1|ridge2|ridge3|tunnel1|tunnel2|tunnel3|pass_reunion)$/.test(scene))return 'scene-motion-mountain';if(/^(river_road|ferry_house|drowned_marker|river_hamlet|river_camp|river_exit|pine_road|charcoal_camp|stag_stones|pine_camp|pine_descent)$/.test(scene))return 'scene-motion-travel';if(scene==='final_view')return 'scene-motion-final';return 'scene-motion-road';}
+function sceneRevealTone(scene){if(/^(broken_span|span_wave1|span_choice|span_final|after_span|receiver_threshold|receiver_assault|keeper_choice)$/.test(scene))return 'tone-danger';if(/^(hollowmere|hollow_inn|hollow_forge|hollow_records|intro|briefing|forge|cliff_excavation|first_mile|farmstead)$/.test(scene))return 'tone-settlement';if(/^(mountain_departure|ridge1|ridge2|ridge3|tunnel1|tunnel2|tunnel3|pass_reunion|final_view)$/.test(scene))return 'tone-mountain';return 'tone-road';}
+function buildFlagshipMontage(){const stage=$('flagshipMontageStage'),nav=$('flagshipMontageNav');if(!stage||!nav)return;stage.innerHTML=flagshipBeats.map((beat,i)=>`<div class="flagship-montage__slide ${i===0?'active':''}" data-beat="${i}" style="background-image:url('${sceneImages[beat.scene]||sceneImages.intro||'assets/glass_home.svg'}')"><div class="flagship-montage__copy"><div class="eyebrow">STORY BEAT ${i+1}</div><h3>${esc(beat.title)}</h3><p>${esc(beat.text)}</p></div></div>`).join('');nav.innerHTML=flagshipBeats.map((beat,i)=>`<button type="button" class="flagship-montage__beat ${i===0?'active':''}" data-beat="${i}"><div class="flagship-montage__beat-index">${i+1}</div><div><b>${esc(beat.title)}</b><span>${esc(beat.text)}</span></div></button>`).join('');nav.querySelectorAll('.flagship-montage__beat').forEach(btn=>btn.onclick=()=>{setFlagshipBeat(Number(btn.dataset.beat),true);});restartFlagshipMontage();}
+function setFlagshipBeat(index,restart=false){const stage=$('flagshipMontageStage'),nav=$('flagshipMontageNav');if(!stage||!nav)return;const slides=[...stage.querySelectorAll('.flagship-montage__slide')],beats=[...nav.querySelectorAll('.flagship-montage__beat')];flagshipMontageIndex=((index%slides.length)+slides.length)%slides.length;slides.forEach((el,i)=>el.classList.toggle('active',i===flagshipMontageIndex));beats.forEach((el,i)=>el.classList.toggle('active',i===flagshipMontageIndex));if(restart)restartFlagshipMontage();}
+function restartFlagshipMontage(){clearInterval(flagshipMontageTimer);flagshipMontageTimer=setInterval(()=>setFlagshipBeat(flagshipMontageIndex+1),4600);}
+function buildFlagshipClassGallery(){const box=$('flagshipClassGallery');if(!box)return;box.innerHTML=classes.map((cls,idx)=>`<article class="flagship-class-card" data-class-card="${cls}"><div class="flagship-class-card__art"><img src="${portraitPath(cls,1)}" data-variant="1" alt="${cls} portrait" onerror="${portraitError(cls)}"></div><div class="flagship-class-card__body"><div class="eyebrow">${classInfo[cls].icon} ${cls.toUpperCase()}</div><h3>${esc(cls)}</h3><p>${esc(flagshipClassNotes[cls]||classInfo[cls].gift)}</p><div class="flagship-class-card__tag">${esc(classInfo[cls].fav.join(' · '))}</div></div></article>`).join('');clearInterval(flagshipClassTimer);flagshipClassTimer=setInterval(()=>{box.querySelectorAll('[data-class-card]').forEach(card=>{const cls=card.dataset.classCard,img=card.querySelector('img');if(!img)return;const current=Number(img.dataset.variant||1);const next=current>=3?1:current+1;card.classList.add('is-swapping');setTimeout(()=>{img.src=portraitPath(cls,next);img.dataset.variant=String(next);card.classList.remove('is-swapping');},210);});},3800);}
+function initFlagshipHome(){buildFlagshipMontage();buildFlagshipClassGallery();}
 const npcInfo={
 "Mara":{"name":"Mara Vale","img":"assets/npc_mara_ai.webp","tag":"Cartographer"},
 "Dain":{"name":"Dain Holt","img":"assets/npc_dain_ai.webp","tag":"Road-captain"},
@@ -141,7 +160,7 @@ function openHomeFlow(mode='create'){
 function closeHomeFlow(){ $('homeFlow')?.classList.add('hidden'); }
 function copyText(text,button,label='Copied!'){if(!text)return;const done=()=>{if(button){const old=button.textContent;button.textContent=label;setTimeout(()=>button.textContent=old,1600);}};if(navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(done).catch(()=>{prompt('Copy this backup key:',text)});else prompt('Copy this backup key:',text);}
 function renderPortraitPicker(mode){const cls=$(mode+'Class').value,box=$(mode+'Portraits');if(!box)return;box.innerHTML=portraitImages[cls].map((src,i)=>`<button type="button" class="portrait-choice ${portraitChoice[mode]===i+1?'selected':''}" data-p="${i+1}"><img src="${heroAsset(src)}" onerror="${portraitError(cls)}" alt="${cls} portrait ${i+1}"></button>`).join('');box.querySelectorAll('.portrait-choice').forEach(b=>b.onclick=()=>{portraitChoice[mode]=Number(b.dataset.p);renderPortraitPicker(mode);renderClassPreview(mode+'Class',mode+'ClassInfo',mode);});}
-function renderClassPreview(selectId,boxId,mode=selectId.startsWith('create')?'create':'join'){const c=$(selectId).value,i=classInfo[c];$(boxId).innerHTML=`<img class="class-portrait" src="${portraitPath(c,portraitChoice[mode])}" onerror="${portraitError(c)}" alt="${c} portrait"><div><strong>${i.icon} ${c}</strong><br>${i.gift}</div>`;}
+function renderClassPreview(selectId,boxId,mode=selectId.startsWith('create')?'create':'join'){const c=$(selectId).value,i=classInfo[c];$(boxId).innerHTML=`<div class="class-portrait-frame"><img class="class-portrait" src="${portraitPath(c,portraitChoice[mode])}" onerror="${portraitError(c)}" alt="${c} portrait"></div><div><strong>${i.icon} ${c}</strong><br>${i.gift}</div>`;}
 ['createClass','joinClass'].forEach(id=>{$(id).innerHTML=classes.map(c=>`<option>${c}</option>`).join('');$(id).addEventListener('change',()=>{const mode=id.startsWith('create')?'create':'join';portraitChoice[mode]=1;renderClassPreview(id,id==='createClass'?'createClassInfo':'joinClassInfo',mode);renderPortraitPicker(mode);});});
 renderClassPreview('createClass','createClassInfo','create');renderClassPreview('joinClass','joinClassInfo','join');renderPortraitPicker('create');renderPortraitPicker('join');
 ['createBackground','joinBackground'].forEach(id=>{if(!$(id))return;$(id).innerHTML=Object.entries(backgrounds).map(([k,v])=>`<option value="${k}">${k} — ${v.edge}</option>`).join('');});
@@ -161,6 +180,7 @@ if($('continueSavedBtn'))$('continueSavedBtn').onclick=()=>{campaignSave=readJso
 if($('copySaveHomeBtn'))$('copySaveHomeBtn').onclick=()=>copyText(readJson('glassRoadCampaign')?.saveToken,$('copySaveHomeBtn'));
 if($('forgetSaveBtn'))$('forgetSaveBtn').onclick=()=>{if(confirm('Forget the saved campaign on this browser? This does not stop a room that is currently running.')){clearKey('glassRoadCampaign');clearKey('glassRoadSession');campaignSave=null;sessionInfo=null;refreshSavedCampaignUI();}};
 if($('restoreBackupBtn'))$('restoreBackupBtn').onclick=()=>{const key=$('backupKeyInput').value.trim();if(!key)return showError('Paste the campaign backup key first.');socket.emit('restoreCampaign',{saveToken:key,asHost:true});};
+initFlagshipHome();
 refreshSavedCampaignUI();
 
 if($('createAdventureCta')) $('createAdventureCta').onclick=()=>openHomeFlow('create');
@@ -455,7 +475,7 @@ function renderGame(){
   show('game');const sc=scenes[state.scene];if(!sc)return;updateAmbience(state.scene);renderVoiceUi();syncVoicePeers();
   if(lastRenderedScene!==state.scene){const artBox=$('sceneArt');if(artBox){artBox.classList.remove('scene-enter');void artBox.offsetWidth;artBox.classList.add('scene-enter');}const story=document.querySelector('.story-panel');if(story){story.classList.remove('story-step');void story.offsetWidth;story.classList.add('story-step');}lastRenderedScene=state.scene;}
   $('sceneTitle').textContent=sc.title;$('sceneText').innerHTML=sc.text.map(x=>`<p>${x}</p>`).join('')+(state.scene==='intro'?openingCompanyHtml():'');$('mission').textContent=sc.mission;const bridge=$('storyBridge');if(bridge){if(pendingStoryBridge&&pendingStoryBridge.scene===state.scene){bridge.innerHTML=`<p>${esc(pendingStoryBridge.text)}</p>`;bridge.classList.remove('hidden');}else bridge.classList.add('hidden');}
-  const art=sceneArt[state.scene]||['🧭',sc.title],image=sceneImages[state.scene]||'assets/glass_home.svg';const [icon,caption]=art;$('sceneArt').className=`scene-art ${state.scene}`;$('sceneArt').style.backgroundImage=`linear-gradient(0deg,rgba(5,10,18,.76),rgba(5,10,18,.08)),url('${image}')`;$('sceneArt').querySelector('.scene-art__icon').textContent=icon;$('sceneArt').querySelector('.scene-art__caption').textContent=caption;renderNpcMoment(state.scene);renderFinaleCallbacks(state.scene);renderQualityPanels(state.scene);
+  const art=sceneArt[state.scene]||['🧭',sc.title],image=sceneImages[state.scene]||'assets/glass_home.svg';const [icon,caption]=art;const artBox=$('sceneArt');artBox.className=`scene-art ${state.scene} ${sceneMotionClass(state.scene)}`;artBox.style.backgroundImage=`linear-gradient(0deg,rgba(5,10,18,.76),rgba(5,10,18,.08)),url('${image}')`;artBox.querySelector('.scene-art__icon').textContent=icon;artBox.querySelector('.scene-art__caption').textContent=caption;renderNpcMoment(state.scene);renderFinaleCallbacks(state.scene);renderQualityPanels(state.scene);
   $('round').textContent=state.round;$('hope').textContent=state.hope;$('threat').textContent=state.threat;$('supplies').textContent=state.supplies;$('relics').textContent=state.relics;if($('coin'))$('coin').textContent=state.coin??0;if($('pressureNote')){$('pressureNote').textContent=threatStatusText(state.threat);$('pressureNote').className='pressure-note '+(state.threat>=5?'high':state.threat>=3?'mid':'low');}
   const active=state.players[state.activeIndex],mine=active?.id===me,waiting=(state.groups||[]).find(g=>g.id===state.currentGroupId)?.waitingMerge;$('turnNotice').className='turn-notice'+(mine?' mine':'');$('turnNotice').innerHTML=waiting?`<b>${esc(state.currentGroupName||'Your group')} has reached the rendezvous.</b> The other group is still on its route.`:mine?`<b>Your turn, ${esc(active.name)}.</b> Choose what your hero does next.${state.groups?.length>1?` <span class="group-badge">${esc(state.currentGroupName)}</span>`:''}`:`Waiting for <b>${esc(active?.name||'')}</b>${state.groups?.length>1?` · ${esc((state.groups||[]).find(g=>(g.playerIds||[]).includes(active?.id))?.name||'another group')}`:''}.`;
   $('choices').innerHTML=''; if(!state.pending){sc.choices.forEach(choice=>{const [id,label,note]=choice;let available=requirementSatisfied(choice);if(id==='repair'&&Number(player()?.gearUpgrades?.condition??3)>=(player()?.gearUpgrades?.maxCondition||3))available=false;if(id==='roadsteel'&&(player()?.gearUpgrades?.roadsteel||Number(state.coin||0)<4))available=false;const b=document.createElement('button');b.className='choice';b.disabled=!mine||!available;b.innerHTML=`<b>${label}</b><span>${note}${available?'':' · NOT CURRENTLY AVAILABLE'}</span>`;b.onclick=()=>socket.emit('chooseAction',{action:id});$('choices').appendChild(b);});}
@@ -729,21 +749,23 @@ function showSceneReveal(scene){
   const sc=scenes[scene]; if(!sc||scene===lastSceneSeen)return; lastSceneSeen=scene;
   if(/span/.test(scene))playSound('storm'); else if(/forge/.test(scene))playSound('dialogue');
   const overlay=$('sceneReveal'); if(!overlay)return;const sk=sceneKind(scene)[1];if(sk==='battle')playSound('storm');else if(sk==='rest'||sk==='conversation')playSound('dialogue');
+  overlay.className=`scene-reveal ${sceneRevealTone(scene)}`;
   overlay.style.backgroundImage=`linear-gradient(rgba(3,8,15,.2),rgba(3,8,15,.82)),url('${sceneImages[scene]||'assets/glass_home.svg'}')`;
   $('revealKicker').textContent=/span/.test(scene)?'DANGER ON THE ROAD':'THE GLASS ROAD';
   $('revealTitle').textContent=sc.title;
   $('revealText').textContent=scene==='troll'?'Something huge moves beneath the bridge.':scene==='storm'?'The calm is over. The sky breaks.':sc.mission;
   overlay.classList.remove('hidden');overlay.classList.add('show');
-  clearTimeout(showSceneReveal.t);showSceneReveal.t=setTimeout(()=>{overlay.classList.remove('show');setTimeout(()=>overlay.classList.add('hidden'),350);},2200);
+  clearTimeout(showSceneReveal.t);showSceneReveal.t=setTimeout(()=>{overlay.classList.remove('show');setTimeout(()=>{overlay.classList.add('hidden');overlay.className='scene-reveal hidden';},350);},2900);
 }
 function showSpotlight(kicker,title,text,image='assets/portraits.webp',ms=2500){
   const overlay=$('sceneReveal'); if(!overlay)return;
+  overlay.className='scene-reveal tone-road';
   overlay.style.backgroundImage=`linear-gradient(rgba(3,8,15,.22),rgba(3,8,15,.82)),url('${image}')`;
   $('revealKicker').textContent=kicker;
   $('revealTitle').textContent=title;
   $('revealText').textContent=text;
   overlay.classList.remove('hidden');overlay.classList.add('show');
-  clearTimeout(showSpotlight.t);showSpotlight.t=setTimeout(()=>{overlay.classList.remove('show');setTimeout(()=>overlay.classList.add('hidden'),350);},ms);
+  clearTimeout(showSpotlight.t);showSpotlight.t=setTimeout(()=>{overlay.classList.remove('show');setTimeout(()=>{overlay.classList.add('hidden');overlay.className='scene-reveal hidden';},350);},ms);
 }
 function showConsequence(title,text,type='good'){
   const box=$('consequenceToast');if(!box)return;

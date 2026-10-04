@@ -1,6 +1,6 @@
 # The Glass Road — The First Crossing
 
-**V1.6.0 — Full HQ Art + WebP Build**
+**V1.7.0 — Flagship Animated Build**
 
 This build rolls all current fixes and visual upgrades into one clean playtest package.
 
@@ -38,3 +38,11 @@ Deploy on Render as a **Web Service**.
 
 - All core visual assets used by the game are now in `public/assets/` as optimized **WebP** files (except the home SVG icon).
 - This build is intended as the **high-quality stress-test candidate**.
+
+
+## Flagship animation pass
+
+- **Phase A:** animated landing-page hero with cinematic drift, mist and glow overlays.
+- **Phase B:** built-in animated story-beats montage on the home screen.
+- **Phase C:** upgraded scene reveals and in-game chapter art motion.
+- **Phase D:** animated class portrait gallery plus subtle portrait motion throughout the interface.
