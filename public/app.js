@@ -171,7 +171,36 @@ async function translateCurrentStory(){
   els.forEach((el,i)=>{if(sources[i])el.textContent=results[i]||sources[i];});
   applyStaticUiLanguage(lang);setLanguageStatus(languageNames[lang]||'');return true;
 }
-function setupLanguageSelector(){const sel=$('languageSelect');if(!sel)return;sel.value=currentLanguage;sel.onchange=async()=>{currentLanguage=sel.value;writeJson('glassRoadLanguage',currentLanguage);translatorInstance=null;translatorLang='';translationToken++;if(currentLanguage==='en'){applyStaticUiLanguage('en');if(state?.phase==='playing'){lastRenderedScene=null;renderGame();}setLanguageStatus('');return;}if(state?.phase==='playing'){lastRenderedScene=null;renderGame();await translateCurrentStory();}else{applyStaticUiLanguage(currentLanguage);setLanguageStatus(languageNames[currentLanguage]);}};applyStaticUiLanguage(currentLanguage);}
+const translationNodeMeta=new WeakMap();
+let fullTranslationTimer=null,translationApplying=false,translationObserver=null;
+function shouldTranslateTextNode(node){
+  const p=node?.parentElement;if(!p)return false;const tag=p.tagName;
+  if(['SCRIPT','STYLE','NOSCRIPT','TEXTAREA'].includes(tag))return false;
+  if(p.closest('[data-no-translate],#languageSelect,.player-ident b,.voice-person b,.room-code-big,.return-pin,.code-input,.journey-map svg'))return false;
+  const s=String(node.nodeValue||'');return /[A-Za-zÀ-ÿ]/.test(s)&&s.trim().length>1;
+}
+function visibleTextNodes(root=document.body){
+  const out=[];const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>shouldTranslateTextNode(n)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT});
+  let n;while((n=walker.nextNode())){const p=n.parentElement;if(!p)continue;const cs=getComputedStyle(p);if(cs.display==='none'||cs.visibility==='hidden')continue;out.push(n);}return out;
+}
+function sourceForNode(node){let meta=translationNodeMeta.get(node);if(!meta){const raw=String(node.nodeValue||''),m=raw.match(/^(\s*)([\s\S]*?)(\s*)$/);meta={leading:m?.[1]||'',source:m?.[2]||raw,trailing:m?.[3]||''};translationNodeMeta.set(node,meta);}return meta;}
+function restoreEnglishPage(){translationApplying=true;try{visibleTextNodes(document.body).forEach(n=>{const m=translationNodeMeta.get(n);if(m)n.nodeValue=m.leading+m.source+m.trailing;});resetStaticUiToEnglish();}finally{translationApplying=false;}}
+async function translateVisiblePage(){
+  const token=++translationToken,lang=currentLanguage,sel=$('languageSelect');
+  if(lang==='en'){restoreEnglishPage();setLanguageStatus('');return true;}
+  if(sel)sel.disabled=true;setLanguageStatus('Translating whole page…');
+  const nodes=visibleTextNodes(document.body);const jobs=[];
+  for(const node of nodes){const m=sourceForNode(node),src=m.source.trim();if(!src)continue;jobs.push({node,meta:m,src});}
+  let failed=0,next=0;
+  async function worker(){while(next<jobs.length){const j=jobs[next++];const translated=await translateText(j.src,lang);if(token!==translationToken||currentLanguage!==lang)return;if(translated){translationApplying=true;j.node.nodeValue=j.meta.leading+translated+j.meta.trailing;translationApplying=false;}else failed++;}}
+  await Promise.all(Array.from({length:Math.min(5,jobs.length||1)},()=>worker()));
+  if(token!==translationToken||currentLanguage!==lang){if(sel)sel.disabled=false;return false;}
+  applyStaticUiLanguage(lang);if(sel)sel.disabled=false;
+  setLanguageStatus(failed?`${languageNames[lang]} · ${failed} items left in English`:`${languageNames[lang]} · translated`);return failed===0;
+}
+function scheduleFullPageTranslation(delay=80){clearTimeout(fullTranslationTimer);if(currentLanguage==='en')return;fullTranslationTimer=setTimeout(()=>translateVisiblePage(),delay);}
+function setupTranslationObserver(){if(translationObserver)return;translationObserver=new MutationObserver(muts=>{if(translationApplying||currentLanguage==='en')return;if(muts.some(m=>m.type==='childList'||m.type==='characterData'))scheduleFullPageTranslation(140);});translationObserver.observe(document.body,{subtree:true,childList:true,characterData:true});}
+function setupLanguageSelector(){const sel=$('languageSelect');if(!sel)return;sel.value=currentLanguage;sel.onchange=async()=>{currentLanguage=sel.value;writeJson('glassRoadLanguage',currentLanguage);translatorInstance=null;translatorLang='';translationToken++;if(currentLanguage==='en'){if(state?.phase==='playing'){lastRenderedScene=null;renderGame();}restoreEnglishPage();setLanguageStatus('');return;}if(state?.phase==='playing'){lastRenderedScene=null;renderGame();}applyStaticUiLanguage(currentLanguage);await translateVisiblePage();};applyStaticUiLanguage(currentLanguage);setupTranslationObserver();if(currentLanguage!=='en')setTimeout(()=>translateVisiblePage(),120);}
 function clueStorageKey(code=roomCode,id=me){return code&&id?`glassRoadClues_${code}_${id}`:null}
 function loadPrivateClues(code=roomCode,id=me){const key=clueStorageKey(code,id);privateClues=key?(readJson(key)||[]):[];return privateClues}
 function savePrivateClues(){const key=clueStorageKey();if(key)writeJson(key,privateClues)}
@@ -256,16 +285,19 @@ function setHomeTab(mode){
 function openHomeFlow(mode='create'){
   $('homeFlow')?.classList.remove('hidden');
   setHomeTab(mode);
+  if(mode==='create'||mode==='join'){renderClassPreview(mode+'Class',mode+'ClassInfo',mode);renderPortraitPicker(mode);preloadHeroPortraits();}
   requestAnimationFrame(()=>{$('homeFlow')?.scrollIntoView({behavior:'smooth',block:'start'});});
   const focusMap={create:'createName',join:'joinCode',return:'returnCode'};
   setTimeout(()=>$(focusMap[mode])?.focus(),120);
+  scheduleFullPageTranslation(120);
 }
 function closeHomeFlow(){ $('homeFlow')?.classList.add('hidden'); }
 function copyText(text,button,label='Copied!'){if(!text)return;const done=()=>{if(button){const old=button.textContent;button.textContent=label;setTimeout(()=>button.textContent=old,1600);}};if(navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(done).catch(()=>{prompt('Copy this backup key:',text)});else prompt('Copy this backup key:',text);}
+function preloadHeroPortraits(){for(const cls of classes){for(const file of (portraitImages[cls]||[])){const img=new Image();img.decoding='async';img.src=heroAsset(file);}}}
 function renderPortraitPicker(mode){const cls=$(mode+'Class').value,box=$(mode+'Portraits');if(!box)return;box.innerHTML=portraitImages[cls].map((src,i)=>`<button type="button" class="portrait-choice ${portraitChoice[mode]===i+1?'selected':''}" data-p="${i+1}"><img src="${heroAsset(src)}" onerror="${portraitError(cls)}" alt="${cls} portrait ${i+1}"></button>`).join('');box.querySelectorAll('.portrait-choice').forEach(b=>b.onclick=()=>{portraitChoice[mode]=Number(b.dataset.p);renderPortraitPicker(mode);renderClassPreview(mode+'Class',mode+'ClassInfo',mode);});}
 function renderClassPreview(selectId,boxId,mode=selectId.startsWith('create')?'create':'join'){const c=$(selectId).value,i=classInfo[c];$(boxId).innerHTML=`<div class="class-portrait-frame"><img class="class-portrait" src="${portraitPath(c,portraitChoice[mode])}" onerror="${portraitError(c)}" alt="${c} portrait"></div><div><strong>${i.icon} ${c}</strong><br>${i.gift}</div>`;}
 ['createClass','joinClass'].forEach(id=>{$(id).innerHTML=classes.map(c=>`<option>${c}</option>`).join('');$(id).addEventListener('change',()=>{const mode=id.startsWith('create')?'create':'join';portraitChoice[mode]=1;renderClassPreview(id,id==='createClass'?'createClassInfo':'joinClassInfo',mode);renderPortraitPicker(mode);});});
-renderClassPreview('createClass','createClassInfo','create');renderClassPreview('joinClass','joinClassInfo','join');renderPortraitPicker('create');renderPortraitPicker('join');
+preloadHeroPortraits();renderClassPreview('createClass','createClassInfo','create');renderClassPreview('joinClass','joinClassInfo','join');renderPortraitPicker('create');renderPortraitPicker('join');
 ['createBackground','joinBackground'].forEach(id=>{if(!$(id))return;$(id).innerHTML=Object.entries(backgrounds).map(([k,v])=>`<option value="${k}">${k} — ${v.edge}</option>`).join('');});
 
 document.addEventListener('pointerdown',()=>{
@@ -316,6 +348,11 @@ socket.on('joined',x=>{acceptIdentity(x,true);show('lobby');});
 socket.on('resumed',x=>{acceptIdentity(x,false);setTimeout(()=>{if(state?.phase==='playing')showConsequence('Welcome back',`You rejoin the company at ${scenes[state.scene]?.title||'the current scene'}. Tap Recap for the last few events.`, 'good');},650);});
 socket.on('campaignSave',x=>{campaignSave=x;writeJson('glassRoadCampaign',x);refreshSavedCampaignUI();if($('saveStatus'))$('saveStatus').textContent=`✓ Auto-saved · ${new Date(x.updatedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;});
 socket.on('secret',x=>{const box=$('secret');box.innerHTML=`<button class="hint-dismiss-button" type="button" aria-label="Close private insight" title="Close private insight"><span aria-hidden="true">×</span></button><b>🔒 Private ${esc(x.title||'insight')}</b><br>${esc(x.text)}<div class="small muted" style="margin-top:6px">Only your character receives this clue. It has been saved in your Hero sheet.</div>`;box.classList.remove('hidden');box.querySelector('.hint-dismiss-button')?.addEventListener('click',()=>box.classList.add('hidden'));const key=`${x.title||'insight'}|${x.text}`;if(!privateClues.some(c=>c.key===key)){privateClues.unshift({key,title:x.title||'Private insight',text:x.text,seenAt:Date.now()});privateClues=privateClues.slice(0,20);savePrivateClues();}if($('heroSheetModal')&&!$('heroSheetModal').classList.contains('hidden'))renderHeroSheet();});
+socket.on('lostArchiveOutcome',x=>{
+  const body=$('lostArchiveBody');if(!body)return;
+  body.innerHTML=`<div class="lost-archive-result"><div class="eyebrow">MEMORY ADDED TO JOURNAL</div><h3>${esc(x.title)}</h3><p>${esc(x.summary)}</p><button id="lostArchiveReturn" class="btn btn-primary full" type="button">Return to the main story</button></div>`;
+  $('lostArchiveModal')?.classList.remove('hidden');setTimeout(()=>{if($('lostArchiveReturn'))$('lostArchiveReturn').onclick=closeLostArchive;},0);scheduleFullPageTranslation(30);
+});
 socket.on('state',s=>{
   const old=state;
   if(rollRequest){
@@ -429,6 +466,29 @@ function mapNodeForScene(scene){
   return cfg.nodes?.find(n=>(n.scenes||[]).includes(scene))||null;
 }
 function routeCoords(trail=[]){const out=[];for(const s of trail){const n=mapNodeForScene(s);if(n&&(!out.length||out[out.length-1].id!==n.id))out.push(n);}return out;}
+const journalNodeHints={
+  brackencliff:['continental_marks','dain_warning','forbidden_mark','network_theory','warm_road_warning','pulse_sequence','timed_pulse','rook_racing','warn_edda','underground_lights'],
+  greywood:['watchtower_map','watchtower_tapping','watchtower_warning'],
+  pine:['watchtower_map','watchtower_tapping','watchtower_warning'],
+  river:['ferryman_note','submerged_landing','ferry_lantern_kept'],
+  span:['road_answers','hounds_network','road_addresses'],
+  hollowmere:['bell_mark_toll','records_removed','ledger_restored'],
+  pass:['bell_pulse','bell_sequence','bell_reburied','second_opening','deliberate_severing']
+};
+function journeyNodeMemories(nodeId){
+  const j=state?.journal||{},ids=new Set(journalNodeHints[nodeId]||[]),mem=[];
+  for(const x of j.clues||[])if(ids.has(x.id))mem.push({kind:'Discovery',title:x.title,text:x.text});
+  for(const x of j.decisions||[])if(ids.has(x.id))mem.push({kind:'Choice',title:x.title,text:x.text});
+  for(const x of j.sideStories||[])if(x.nodeId===nodeId)mem.push({kind:'Lost Archive',title:x.title,text:`${x.hero||'The company'} chose “${x.choice}”. ${x.summary}`});
+  return mem;
+}
+function openJourneyDetail(nodeId){
+  const n=(worldMapConfig.nodes||[]).find(x=>x.id===nodeId);if(!n)return;
+  const mem=journeyNodeMemories(nodeId);$('journeyDetailTitle').textContent=n.title;
+  $('journeyDetailBody').innerHTML=`<div class="journey-memory-lead">${esc(journeySummary(nodeId))}</div>${mem.length?`<div class="journey-memory-list">${mem.map(m=>`<article class="memory-card"><div class="eyebrow">${esc(m.kind)}</div><h3>${esc(m.title)}</h3><p>${esc(m.text)}</p></article>`).join('')}</div>`:'<p class="small muted">No major memories have been recorded here yet.</p>'}`;
+  $('journeyDetailModal').classList.remove('hidden');scheduleFullPageTranslation(30);
+}
+function closeJourneyDetail(){$('journeyDetailModal')?.classList.add('hidden');}
 function renderJourney(){
   const box=$('journey');if(!box||!state)return;const cfg=worldMapConfig||{};const nodes=cfg.nodes||[];
   const visitedScenes=new Set(state.mapVisited||[]);for(const g of state.groups||[])for(const s of g.trail||[])visitedScenes.add(s);for(const h of state.routeHistory||[])for(const s of h.trail||[])visitedScenes.add(s);
@@ -436,9 +496,9 @@ function renderJourney(){
   const holes=visitedNodes.map(n=>`<circle cx="${n.x}" cy="${n.y}" r="${n.reveal||14}" fill="black"/>`).join('');
   const history=(state.routeHistory||[]).map((g,i)=>{const pts=routeCoords(g.trail);return pts.length>1?`<polyline class="map-route map-route--history" points="${pts.map(n=>`${n.x},${n.y}`).join(' ')}"/>`:'';}).join('');
   const current=(state.groups||[]).map((g,i)=>{const pts=routeCoords(g.trail);if(!pts.length)return '';const line=pts.length>1?`<polyline class="map-route map-route--${i%2?'b':'a'}" points="${pts.map(n=>`${n.x},${n.y}`).join(' ')}"/>`:'';const last=pts[pts.length-1];return `${line}<circle class="map-current map-current--${i%2?'b':'a'}" cx="${last.x}" cy="${last.y}" r="2.4"/><text class="map-group-label" x="${Math.min(94,last.x+3)}" y="${Math.max(7,last.y-3)}">${esc(g.name||'Company')}</text>`;}).join('');
-  const labels=visitedNodes.map(n=>`<g class="map-place"><circle cx="${n.x}" cy="${n.y}" r="1.7"/><text x="${Math.min(92,n.x+2.5)}" y="${Math.max(6,n.y-2)}">${esc(n.title)}</text></g>`).join('');
+  const labels=visitedNodes.map(n=>`<g class="map-place map-place--clickable" data-map-node="${n.id}"><circle cx="${n.x}" cy="${n.y}" r="2.2"/><text x="${Math.min(92,n.x+2.5)}" y="${Math.max(6,n.y-2)}">${esc(n.title)}</text></g>`).join('');
   const terrain=(cfg.terrain||[]).map(x=>x.type==='path'?`<path class="map-terrain map-terrain--${x.kind||'ridge'}" d="${x.d}"/>`:`<text class="map-symbol" x="${x.x}" y="${x.y}">${x.symbol||'▲'}</text>`).join('');
-  box.innerHTML=`<div class="world-map"><div class="world-map__title">${esc(cfg.title||'Journey So Far')}</div><svg viewBox="0 0 100 72" role="img" aria-label="Explored map"><defs><mask id="fogMask"><rect width="100" height="72" fill="white"/>${holes}</mask><filter id="fogBlur"><feGaussianBlur stdDeviation="1.5"/></filter></defs><rect class="map-paper" width="100" height="72" rx="2"/>${cfg.baseSvg||''}${terrain}${history}${current}${labels}<rect class="map-fog" x="0" y="0" width="100" height="72" mask="url(#fogMask)" filter="url(#fogBlur)"/><rect class="map-edge" x=".7" y=".7" width="98.6" height="70.6" rx="2"/></svg><div class="world-map__legend">Explored ground is uncovered. The rest remains hidden in fog.${(state.groups||[]).length>1?' Your separated groups leave different trails.':''}</div></div>`;
+  box.innerHTML=`<div class="world-map"><div class="world-map__title">${esc(cfg.title||'Journey So Far')}</div><svg viewBox="0 0 100 72" role="img" aria-label="Explored map"><defs><mask id="fogMask"><rect width="100" height="72" fill="white"/>${holes}</mask><filter id="fogBlur"><feGaussianBlur stdDeviation="1.5"/></filter></defs><rect class="map-paper" width="100" height="72" rx="2"/>${cfg.baseSvg||''}${terrain}${history}${current}${labels}<rect class="map-fog" x="0" y="0" width="100" height="72" mask="url(#fogMask)" filter="url(#fogBlur)"/><rect class="map-edge" x=".7" y=".7" width="98.6" height="70.6" rx="2"/></svg><div class="world-map__legend">Explored ground is uncovered. Click a named place to revisit what happened there.${(state.groups||[]).length>1?' Your separated groups leave different trails.':''}</div></div>`;box.querySelectorAll('[data-map-node]').forEach(el=>el.addEventListener('click',()=>openJourneyDetail(el.dataset.mapNode)));
 }
 function npcForScene(scene){
   if(scene==='farmstead')return 'Edda';
@@ -577,17 +637,44 @@ function renderGame(){
   show('game');const sc=scenes[state.scene]||{title:'Journey continues',mission:'This route is still active. Your progress is safe.',text:['The game is recovering this part of the journey. If the choices do not return, refresh this tab and you will rejoin at the latest saved point.'],choices:[]};updateAmbience(state.scene);renderVoiceUi();syncVoicePeers();
   if(lastRenderedScene!==state.scene){const artBox=$('sceneArt');if(artBox){artBox.classList.remove('scene-enter');void artBox.offsetWidth;artBox.classList.add('scene-enter');}const story=document.querySelector('.story-panel');if(story){story.classList.remove('story-step');void story.offsetWidth;story.classList.add('story-step');}lastRenderedScene=state.scene;}
   $('sceneTitle').textContent=sc.title;$('sceneTitle').dataset.translateSource=sc.title;$('sceneText').innerHTML=sc.text.map(x=>`<p>${x}</p>`).join('')+(state.scene==='intro'?openingCompanyHtml():'');$('mission').textContent=sc.mission;$('mission').dataset.translateSource=sc.mission;const bridge=$('storyBridge');if(bridge){if(pendingStoryBridge&&pendingStoryBridge.scene===state.scene){bridge.innerHTML=`<p>${esc(pendingStoryBridge.text)}</p>`;bridge.classList.remove('hidden');}else bridge.classList.add('hidden');}
-  const art=sceneArt[state.scene]||['🧭',sc.title],image=sceneImages[state.scene]||'assets/glass_home.svg',loopImage=sceneLoops[state.scene]||'';const [icon,caption]=art;const artBox=$('sceneArt'),media=$('sceneArtMedia');artBox.className=`scene-art ${state.scene} ${sceneMotionClass(state.scene)} ${sceneAtmosClass(state.scene)} ${loopImage?'has-media':''}`;artBox.style.backgroundImage=`linear-gradient(0deg,rgba(5,10,18,.76),rgba(5,10,18,.08)),url('${image}')`;if(media){if(loopImage){if(media.getAttribute('src')!==loopImage)media.setAttribute('src',loopImage);media.classList.remove('hidden');}else{media.classList.add('hidden');media.removeAttribute('src');}}artBox.querySelector('.scene-art__icon').textContent=icon;artBox.querySelector('.scene-art__caption').textContent=caption;renderNpcMoment(state.scene);renderFinaleCallbacks(state.scene);renderQualityPanels(state.scene);
+  const art=sceneArt[state.scene]||['🧭',sc.title],image=sceneImages[state.scene]||'assets/glass_home.svg',loopImage=sceneLoops[state.scene]||'';const [icon,caption]=art;const artBox=$('sceneArt'),media=$('sceneArtMedia');artBox.className=`scene-art ${state.scene} ${sceneMotionClass(state.scene)} ${sceneAtmosClass(state.scene)} ${loopImage?'has-media':''}`;artBox.style.backgroundImage=`linear-gradient(0deg,rgba(5,10,18,.76),rgba(5,10,18,.08)),url('${image}')`;if(media){if(loopImage){if(media.getAttribute('src')!==loopImage)media.setAttribute('src',loopImage);media.classList.remove('hidden');}else{media.classList.add('hidden');media.removeAttribute('src');}}artBox.querySelector('.scene-art__icon').textContent=icon;artBox.querySelector('.scene-art__caption').textContent=caption;renderNpcMoment(state.scene);renderFinaleCallbacks(state.scene);renderQualityPanels(state.scene);scheduleFullPageTranslation(100);
   $('round').textContent=state.round;$('hope').textContent=state.hope;$('threat').textContent=state.threat;$('supplies').textContent=state.supplies;$('relics').textContent=state.relics;if($('coin'))$('coin').textContent=state.coin??0;if($('pressureNote')){$('pressureNote').textContent=threatStatusText(state.threat);$('pressureNote').className='pressure-note '+(state.threat>=5?'high':state.threat>=3?'mid':'low');}
-  const active=state.players[state.activeIndex],mine=active?.id===me,waiting=(state.groups||[]).find(g=>g.id===state.currentGroupId)?.waitingMerge;$('turnNotice').className='turn-notice'+(mine?' mine':'');$('turnNotice').innerHTML=waiting?`<b>${esc(state.currentGroupName||'Your group')} has reached the rendezvous.</b> The other group is still on its route.`:mine?`<b>Your turn, ${esc(active.name)}.</b> Choose what your hero does next.${state.groups?.length>1?` <span class="group-badge">${esc(state.currentGroupName)}</span>`:''}`:`Waiting for <b>${esc(active?.name||'')}</b>${state.groups?.length>1?` · ${esc((state.groups||[]).find(g=>(g.playerIds||[]).includes(active?.id))?.name||'another group')}`:''}.`;
+  const active=state.players[state.activeIndex],mine=active?.id===me,waiting=(state.groups||[]).find(g=>g.id===state.currentGroupId)?.waitingMerge;renderLostArchive(mine);$('turnNotice').className='turn-notice'+(mine?' mine':'');$('turnNotice').innerHTML=waiting?`<b>${esc(state.currentGroupName||'Your group')} has reached the rendezvous.</b> The other group is still on its route.`:mine?`<b>Your turn, ${esc(active.name)}.</b> Choose what your hero does next.${state.groups?.length>1?` <span class="group-badge">${esc(state.currentGroupName)}</span>`:''}`:`Waiting for <b>${esc(active?.name||'')}</b>${state.groups?.length>1?` · ${esc((state.groups||[]).find(g=>(g.playerIds||[]).includes(active?.id))?.name||'another group')}`:''}.`;
   $('choices').innerHTML=''; if(!state.pending){sc.choices.forEach(choice=>{const [id,label,note]=choice;let available=requirementSatisfied(choice);if(id==='repair'&&Number(player()?.gearUpgrades?.condition??3)>=(player()?.gearUpgrades?.maxCondition||3))available=false;if(id==='roadsteel'&&(player()?.gearUpgrades?.roadsteel||Number(state.coin||0)<4))available=false;const b=document.createElement('button');b.className='choice';b.disabled=!mine||!available;b.innerHTML=`<b>${label}</b><span>${note}${available?'':' · NOT CURRENTLY AVAILABLE'}</span>`;b.onclick=()=>socket.emit('chooseAction',{action:id});$('choices').appendChild(b);});}
   if(currentLanguage!=='en')setTimeout(translateCurrentStory,0);
   renderChallenge(mine);renderHostTools();renderInventory();renderJourney();$('party').innerHTML=state.players.map(p=>playerCard(p,true)).join('');$('log').innerHTML=state.log.slice().reverse().map(x=>`<div class="log-item">• ${esc(x)}</div>`).join('');renderLastRoll();
 }
 
-function renderJournal(){const j=state?.journal||{people:{},clues:[],decisions:[],conclusions:[]},body=$('journalBody');if(!body)return;const people=Object.values(j.people||{}),clues=j.clues||[],decisions=j.decisions||[],conclusions=j.conclusions||[],questions=journalQuestions();body.innerHTML=`<div class="journal-grid"><section><div class="eyebrow">PEOPLE</div>${people.length?people.map(p=>`<div class="journal-entry"><b>${esc(p.name||p.id)}</b>${p.status?`<span class="journal-status">${esc(p.status)}</span>`:''}<p>${esc(p.note||'You have crossed paths.')}</p></div>`).join(''):'<p class="small muted">Important relationships will appear here.</p>'}</section><section><div class="eyebrow">CLUES & CONCLUSIONS</div>${conclusions.map(x=>`<div class="journal-entry conclusion"><b>✦ ${esc(x.title)}</b><p>${esc(x.text)}</p></div>`).join('')}${clues.length?clues.map(x=>`<div class="journal-entry"><b>${esc(x.title)}</b><p>${esc(x.text)}</p></div>`).join(''):'<p class="small muted">Useful information will be recorded here.</p>'}</section><section><div class="eyebrow">UNANSWERED QUESTIONS</div>${questions.length?questions.map(x=>`<div class="journal-entry question"><b>? ${esc(x)}</b></div>`).join(''):'<p class="small muted">Nothing obvious remains unanswered.</p>'}</section><section><div class="eyebrow">DECISIONS</div>${decisions.length?decisions.map(x=>`<div class="journal-entry"><b>${esc(x.title)}</b><p>${esc(x.text)}</p></div>`).join(''):'<p class="small muted">Major choices will be remembered here.</p>'}</section></div>`;}
+function renderLostArchive(mine){
+  const box=$('lostArchiveCard');if(!box)return;const st=state?.lostArchive;
+  if(!st){box.classList.add('hidden');box.innerHTML='';return;}
+  box.innerHTML=`<div class="lost-archive-mark">✦</div><div><div class="eyebrow">LOST ARCHIVE · OPTIONAL</div><h3>${esc(st.title)}</h3><p>${esc(st.teaser)}</p></div><button id="openLostArchive" class="btn btn-ghost btn-small" type="button" ${mine&&!state.pending?'':'disabled'}>Explore side story</button>`;
+  box.classList.remove('hidden');const btn=$('openLostArchive');if(btn)btn.onclick=openLostArchive;
+}
+function openLostArchive(){
+  const st=state?.lostArchive;if(!st)return;
+  $('lostArchiveTitle').textContent=st.title;
+  $('lostArchiveBody').innerHTML=`<p class="lost-archive-intro">${esc(st.body)}</p><div class="lost-archive-choices">${st.choices.map(c=>`<button class="choice lost-archive-choice" type="button" data-choice="${c.id}"><b>${esc(c.label)}</b><span>${esc(c.note)}</span></button>`).join('')}</div><p class="small muted">This is optional. Resolving it does not replace the main story choice.</p>`;
+  $('lostArchiveModal').classList.remove('hidden');$('lostArchiveBody').querySelectorAll('[data-choice]').forEach(b=>b.onclick=()=>{b.disabled=true;socket.emit('resolveLostArchive',{storyId:st.id,choiceId:b.dataset.choice});});scheduleFullPageTranslation(30);
+}
+function closeLostArchive(){$('lostArchiveModal')?.classList.add('hidden');}
+function storyMemoryCards(){
+  const j=state?.journal||{},cards=[];
+  for(const x of j.sideStories||[])cards.push({kicker:'LOST ARCHIVE',title:x.title,text:`${x.hero||'The company'} chose “${x.choice}”. ${x.summary}`});
+  if(state?.flags?.road_network)cards.push({kicker:'BIG DISCOVERY',title:'The Glass Road was a network',text:'The company connected enough evidence to realise this was never one road to one destination.'});
+  if(state?.flags?.road_infrastructure)cards.push({kicker:'BIG DISCOVERY',title:'The Road served whole settlements',text:'Water, warmth and signals once moved through the old system as well as travellers.'});
+  if(state?.flags?.road_listens)cards.push({kicker:'BIG DISCOVERY',title:'The Road answers instructions',text:'Milestones, guardians and doors all react to repeated signals.'});
+  return cards.slice(-8).reverse();
+}
+function storySoFarText(){
+  const visited=new Set(state?.mapVisited||[]),names=(worldMapConfig.nodes||[]).filter(n=>(n.scenes||[]).some(s=>visited.has(s))).map(n=>n.title);
+  if(!names.length)return 'The First Crossing has only just begun.';
+  const side=(state?.journal?.sideStories||[]).length;return `The company has reached ${names.join(', ')}.${side?` Along the way you explored ${side} optional side stor${side===1?'y':'ies'} that now belong to your version of the journey.`:''}`;
+}
+function renderJournal(){const j=state?.journal||{people:{},clues:[],decisions:[],conclusions:[],sideStories:[]},body=$('journalBody');if(!body)return;const people=Object.values(j.people||{}),clues=j.clues||[],decisions=j.decisions||[],conclusions=j.conclusions||[],questions=journalQuestions(),memories=storyMemoryCards();body.innerHTML=`<div class="journal-story-so-far"><div class="eyebrow">STORY SO FAR</div><h3>Your First Crossing</h3><p>${esc(storySoFarText())}</p></div>${memories.length?`<div class="memory-card-grid">${memories.map(m=>`<article class="memory-card"><div class="eyebrow">${esc(m.kicker)}</div><h3>${esc(m.title)}</h3><p>${esc(m.text)}</p></article>`).join('')}</div>`:''}<div class="journal-grid"><section><div class="eyebrow">PEOPLE</div>${people.length?people.map(p=>`<div class="journal-entry"><b>${esc(p.name||p.id)}</b>${p.status?`<span class="journal-status">${esc(p.status)}</span>`:''}<p>${esc(p.note||'You have crossed paths.')}</p></div>`).join(''):'<p class="small muted">Important relationships will appear here.</p>'}</section><section><div class="eyebrow">DISCOVERIES</div>${conclusions.map(x=>`<div class="journal-entry conclusion"><b>✦ ${esc(x.title)}</b><p>${esc(x.text)}</p></div>`).join('')}${clues.length?clues.map(x=>`<div class="journal-entry"><b>${esc(x.title)}</b><p>${esc(x.text)}</p></div>`).join(''):'<p class="small muted">Useful information will be recorded here.</p>'}</section><section><div class="eyebrow">CHOICES & QUESTIONS</div>${decisions.length?decisions.map(x=>`<div class="journal-entry"><b>${esc(x.title)}</b><p>${esc(x.text)}</p></div>`).join(''):'<p class="small muted">Major choices will be remembered here.</p>'}${questions.length?questions.map(x=>`<div class="journal-entry question"><b>? ${esc(x)}</b></div>`).join(''):'<p class="small muted">Nothing obvious remains unanswered.</p>'}</section></div>`;scheduleFullPageTranslation(30);}
 function openJournal(){renderJournal();$('journalModal')?.classList.remove('hidden');}
 function closeJournal(){$('journalModal')?.classList.add('hidden');}
+if($('lostArchiveClose'))$('lostArchiveClose').onclick=closeLostArchive;if($('lostArchiveModal'))$('lostArchiveModal').addEventListener('click',e=>{if(e.target===$('lostArchiveModal'))closeLostArchive();});if($('journeyDetailClose'))$('journeyDetailClose').onclick=closeJourneyDetail;if($('journeyDetailModal'))$('journeyDetailModal').addEventListener('click',e=>{if(e.target===$('journeyDetailModal'))closeJourneyDetail();});
 if($('journalBtn'))$('journalBtn').onclick=openJournal;if($('journalClose'))$('journalClose').onclick=closeJournal;if($('journalModal'))$('journalModal').addEventListener('click',e=>{if(e.target===$('journalModal'))closeJournal();});
 
 function renderHeroSheet(){

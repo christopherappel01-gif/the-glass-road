@@ -43,6 +43,13 @@ app.post('/api/translate', async(req,res)=>{
     res.json({text:translated,provider:'deepl'});
   }catch(err){console.error('[translation]',err);res.status(502).json({error:'Translation service unavailable'});}
 });
+app.post('/api/translate-batch', async(req,res)=>{
+  const texts=Array.isArray(req.body?.texts)?req.body.texts.map(x=>String(x||'').trim()).filter(Boolean).slice(0,100):[];
+  const target=String(req.body?.target||'').toLowerCase();
+  if(!texts.length||!['nl','fr','de'].includes(target)||texts.some(x=>x.length>5000))return res.status(400).json({error:'Invalid translation request'});
+  const apiKey=process.env.DEEPL_API_KEY;if(!apiKey)return res.status(503).json({error:'Server translation is not configured'});
+  try{const endpoint=String(process.env.DEEPL_API_URL||(apiKey.endsWith(':fx')?'https://api-free.deepl.com/v2/translate':'https://api.deepl.com/v2/translate'));const body=new URLSearchParams();for(const t of texts)body.append('text',t);body.append('source_lang','EN');body.append('target_lang',target.toUpperCase());const r=await fetch(endpoint,{method:'POST',headers:{Authorization:`DeepL-Auth-Key ${apiKey}`,'Content-Type':'application/x-www-form-urlencoded'},body});if(!r.ok)throw new Error(`DeepL ${r.status}`);const data=await r.json();res.json({texts:(data?.translations||[]).map(x=>x.text||'')});}catch(err){console.error('[translation-batch]',err);res.status(502).json({error:'Translation service unavailable'});}
+});
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/health', (req, res) => res.status(200).send('ok'));
 
@@ -61,6 +68,65 @@ const talents = {
 };
 const classGear = {"Knight":"Tempered Longsword & Buckler","Ranger":"Ashwood Bow & Hunting Knife","Thief":"Matched Short Blades & Picks","Mage":"Etched Focus Staff","Monk":"Ironwood Staff & Travel Wraps","Engineer":"Field Hammer & Road Tools"};
 const itemCatalog = {"road_shard":{"name":"Warm Road Shard","icon":"◈","desc":"A palm-sized fragment of black road-metal. It remains faintly warm away from the Road."},"marker_rubbing":{"name":"Drowned Marker Rubbing","icon":"▤","desc":"A careful rubbing from the River Tern milestone; it marks an old water junction."},"glass_core":{"name":"Glass Hound Core","icon":"◇","desc":"A warm translucent core recovered from a destroyed Road guardian."},"red_scarf":{"name":"Rook Scout's Red Scarf","icon":"⌁","desc":"Proof that one of Rook's scouts was rescued on the high ridge."},"sealed_token":{"name":"Sealed Chamber Token","icon":"⬡","desc":"A warm metal token recovered from a chamber the Road bends around rather than crossing."},"road_key":{"name":"Road Route Key","icon":"✧","desc":"A seven-spoked route pattern copied from the sealed mountain door."}};
+
+const lostArchiveCatalog = {
+  pine_watch:{
+    id:'pine_watch', scenes:['pine_road','charcoal_camp'], nodeId:'pine', title:'The Watchtower Without a Door',
+    teaser:'A roofless watchtower stands just beyond the trees. There is no doorway at ground level, but someone has lit a candle inside.',
+    body:'The tower is older than the road markers around it. Ivy covers most of the stone, yet a narrow slit high above the ground glows with warm candlelight. No footprints lead to it.',
+    choices:[
+      {id:'climb',label:'Climb the broken outer stones',note:'Risk a closer look from above.',summary:'You found an old lookout chamber and a chalk map showing that travellers once watched the Road from a safe distance.',effects:{hope:1},clue:{id:'watchtower_map',title:'The old watchtower watched the Road, not the valley',text:'A chalk map inside the tower marks safe observation points facing the Glass Road, suggesting earlier travellers deliberately kept their distance.'},rep:'pathfinder'},
+      {id:'listen',label:'Stay below and listen',note:'Look for a safer clue before entering.',summary:'You heard a faint tapping from inside the stone and realised it matches the rhythm of the warm pulses under the Road.',clue:{id:'watchtower_tapping',title:'The watchtower repeats the Road’s pulse',text:'A faint tapping inside the old tower follows the same repeating rhythm as the warmth beneath the Glass Road.'},rep:'scholar'},
+      {id:'mark',label:'Leave a warning mark and move on',note:'Protect the next travellers rather than investigate.',summary:'You left a clear warning for anyone following the company. Later travellers will know this place deserves caution.',effects:{hope:1},decision:{id:'watchtower_warning',title:'You left a warning at the old watchtower',text:'The company chose to protect whoever followed rather than disturb an unknown place.'},rep:'protector'}
+    ]
+  },
+  ferry_lantern:{
+    id:'ferry_lantern', scenes:['river_road','ferry_house','drowned_marker'], nodeId:'river', title:'The Ferryman’s Last Lantern',
+    teaser:'A lantern is burning inside the abandoned ferry house, though the building has been empty for years.',
+    body:'The flame is steady despite broken windows and river wind. Beneath the lantern sits a small wooden box, swollen by damp and tied shut with blue cord.',
+    choices:[
+      {id:'open',label:'Open the waterlogged box',note:'Find out what the ferryman left behind.',summary:'Inside were old crossing tokens and a note: “When the black road warms, wait for the river to fall before you trust it.”',effects:{coin:2},clue:{id:'ferryman_note',title:'The ferryman knew the Road and river affected each other',text:'An old ferry note warns travellers to wait for falling water when the Glass Road grows warm.'},rep:'scholar'},
+      {id:'follow',label:'Follow the lantern light to the bank',note:'See what the light is pointing toward.',summary:'The lantern’s reflection revealed a submerged line of black stone leading beneath the river toward a forgotten landing.',effects:{relics:1},clue:{id:'submerged_landing',title:'A forgotten Road landing lies beneath the River Tern',text:'Lantern light revealed black stone under the river, suggesting an old crossing point now hidden by water.'},rep:'pathfinder'},
+      {id:'relight',label:'Trim the wick and leave it burning',note:'Keep the old signal alive for whoever comes next.',summary:'You restored the lantern and left it burning in the window. The act becomes a small promise that the Road will not erase every old kindness.',effects:{hope:1},decision:{id:'ferry_lantern_kept',title:'You kept the ferryman’s lantern burning',text:'The company chose to preserve an old signal for later travellers.'},rep:'negotiator'}
+    ]
+  },
+  missing_ledger:{
+    id:'missing_ledger', scenes:['hollowmere','hollow_inn','hollow_records'], nodeId:'hollowmere', title:'The Missing Page',
+    teaser:'A torn ledger page has been tucked behind a loose wall board. Someone removed it from the toll-house records on purpose.',
+    body:'The page lists ordinary tolls until the final line: “No fee charged to those carrying the bell-mark east.” The name column has been carefully cut away.',
+    choices:[
+      {id:'restore',label:'Return the page to the archive',note:'Put the record back where it belongs.',summary:'You restored the missing page and marked where it was found. The archive is more complete, but whoever hid it may notice.',clue:{id:'bell_mark_toll',title:'Travellers with the bell-mark crossed without paying',text:'A hidden toll record says travellers carrying a bell-mark were allowed east without payment.'},decision:{id:'ledger_restored',title:'You restored the missing archive page',text:'The company chose to preserve the public record rather than keep the evidence private.'},rep:'scholar'},
+      {id:'copy',label:'Copy it and leave the original hidden',note:'Keep the clue without revealing you found it.',summary:'You copied the record exactly and returned the page to its hiding place. Whoever concealed it will not know you have the information.',clue:{id:'bell_mark_toll',title:'Travellers with the bell-mark crossed without paying',text:'A hidden toll record says travellers carrying a bell-mark were allowed east without payment.'},rep:'bold'},
+      {id:'ask',label:'Ask the clerk who removed it',note:'Turn the clue into a conversation.',summary:'The clerk admitted an official ordered several eastern records removed after people began asking about the Bell Cairn.',clue:{id:'records_removed',title:'Someone ordered eastern crossing records removed',text:'A Hollowmere clerk says officials deliberately removed records connected to the Bell Cairn and eastern crossing.'},effects:{hope:1},rep:'negotiator'}
+    ]
+  },
+  buried_bell:{
+    id:'buried_bell', scenes:['ridge2','ridge3','mountain_departure'], nodeId:'pass', title:'The Bell Beneath the Snow',
+    teaser:'A small bronze bell is half-buried beside the path. It has no clapper, yet it gives a faint note when the Road pulses.',
+    body:'The bell is green with age and wrapped in rotten red thread. Scratched inside the rim are three simple marks: road, shelter, return.',
+    choices:[
+      {id:'take',label:'Carry the bell onward',note:'Keep the strange object with the company.',summary:'You carried the clapperless bell onward. It gives a faint note whenever the Road’s pulse strengthens.',effects:{relics:1},clue:{id:'bell_pulse',title:'The buried bell answers the Road’s pulse',text:'A clapperless bronze bell rings faintly whenever the Glass Road’s pulse grows stronger.'},rep:'bold'},
+      {id:'sequence',label:'Repeat the three marks aloud',note:'Test whether the marks are an old traveller’s instruction.',summary:'When you named road, shelter and return, the bell answered with three tones and the nearest milestone warmed in the same order.',clue:{id:'bell_sequence',title:'The bell and milestone answer the same three-part sequence',text:'Speaking the bell’s three marks caused the bell and nearby milestone to answer in matching order.'},effects:{hope:1},rep:'scholar'},
+      {id:'leave',label:'Rebury it carefully',note:'Respect the old marker and leave it for the next traveller.',summary:'You reburied the bell exactly where it was found and marked the spot on the expedition map.',decision:{id:'bell_reburied',title:'You left the buried bell in place',text:'The company treated the old marker as something to preserve rather than collect.'},rep:'protector'}
+    ]
+  }
+};
+
+function ensureLostArchiveJournal(room){
+  const j=ensureJournal(room);
+  j.sideStories=Array.isArray(j.sideStories)?j.sideStories:[];
+  return j.sideStories;
+}
+function lostArchiveFor(room,group){
+  if(!room||!group||group.waitingMerge||group.pending)return null;
+  const done=new Set(ensureLostArchiveJournal(room).map(x=>x.id));
+  return Object.values(lostArchiveCatalog).find(st=>!done.has(st.id)&&st.scenes.includes(group.scene))||null;
+}
+function publicLostArchive(st){
+  if(!st)return null;
+  return {id:st.id,title:st.title,teaser:st.teaser,body:st.body,nodeId:st.nodeId,choices:st.choices.map(c=>({id:c.id,label:c.label,note:c.note}))};
+}
+
 
 const contextualClues = {"intro":{"Ranger":"Every gull along Brackencliff is circling inland instead of the sea. The animals noticed the Road before the crowds did.","Mage":"The road-mark is not a conventional rune. Its lines look more like a diagram of relationships than a word.","Engineer":"The black surface has no tool marks, joins or aggregate. Whatever made it did not lay it like stone.","Monk":"Ilyra keeps touching the hidden symbol in her sleeve whenever anyone says the word 'destination'."},"cliff_excavation":{"Engineer":"The warmth moves beneath the Road rather than radiating from the sunlit surface.","Scholar":"The seven-groove milestone resembles counting devices used by cultures separated by centuries.","Sailor":"The Road's pulse has the regularity of a lighthouse rotation, not weather or geology."},"first_mile":{"Ranger":"Small animals cross the fields freely but avoid placing paws on the Glass Road itself.","Thief":"Someone has already tested the Road with iron spikes. The marks were carefully removed afterward."},"stag_stones":{"Monk":"The skulls are not offerings. They face away as if meant to teach living things where not to look.","Mage":"The standing stones damp the Road's pulse for several heartbeats as it passes through the ring."},"broken_span":{"Knight":"The bridge approach gives you one defensible line. If the company scatters, the hounds will reach the wagons.","Engineer":"The creatures' joints flex along repeating seams. They are constructed, not born."},"span_choice":{"Mage":"The hounds pause a fraction before the milestone brightens. The signal comes first; movement follows.","Engineer":"The glowing groove is behaving like a control line, not decoration."},"hollowmere":{"Streetwise":"Half the people in the Lantern Inn are pretending not to watch the expedition. That usually means somebody important is paying for reports.","Noble":"The royal courier's seal is deliberately low-ranking for a message that clearly matters."},"ridge2":{"Scholar":"The three-language warning was added in different eras. The oldest line is also the shortest.","Monk":"The bells feel ceremonial, but their sequence is too exact to be merely ritual."},"tunnel2":{"Engineer":"The galleries separate travel, heat and water into different channels. Someone designed this place to serve whole settlements.","Mage":"The blue light is not leaking power. It is moving it."},"pass_reunion":{"Ranger":"The air beyond the pass smells warmer and wetter than the western side. The valley ahead has its own climate.","Mage":"The distant towers answer one another before the Road beneath you responds."}};
 
@@ -159,13 +225,13 @@ function initMainGroup(room,scene='intro'){
 }
 function publicState(room,viewerId=null){
   const g=viewerId?groupForPlayer(room,viewerId):activeGroup(room);const scene=g?.scene||primaryScene(room);
-  return {...room,scene,pending:g?.pending||null,lastRoll:g?.lastRoll||null,currentGroupId:g?.id||null,currentGroupName:g?.name||'Company',currentGroupPlayerIds:[...(g?.playerIds||[])],groups:(room.groups||[]).map(x=>({id:x.id,name:x.name,playerIds:[...(x.playerIds||[])],scene:x.scene,trail:[...(x.trail||[])],waitingMerge:!!x.waitingMerge,splitSet:x.splitSet||null})),routeHistory:(room.routeHistory||[]).map(x=>({...x,trail:[...(x.trail||[])],playerIds:[...(x.playerIds||[])]})),players:room.players.map(({resumeToken,returnPin,socketId,...p})=>p),itemCatalog,talentCatalog:talents};
+  return {...room,scene,pending:g?.pending||null,lastRoll:g?.lastRoll||null,lostArchive:publicLostArchive(lostArchiveFor(room,g)),currentGroupId:g?.id||null,currentGroupName:g?.name||'Company',currentGroupPlayerIds:[...(g?.playerIds||[])],groups:(room.groups||[]).map(x=>({id:x.id,name:x.name,playerIds:[...(x.playerIds||[])],scene:x.scene,trail:[...(x.trail||[])],waitingMerge:!!x.waitingMerge,splitSet:x.splitSet||null})),routeHistory:(room.routeHistory||[]).map(x=>({...x,trail:[...(x.trail||[])],playerIds:[...(x.playerIds||[])]})),players:room.players.map(({resumeToken,returnPin,socketId,...p})=>p),itemCatalog,talentCatalog:talents};
 }
 function migrateRoom(room){
   const legacySession=Number(room.session||0);
   if(room.scene==='birthday')room.scene='intro';
   if(room.phase==='break'){room.scene='intro';room.phase='playing';}
-  room.items=Array.isArray(room.items)?room.items:[];room.itemUses=room.itemUses||{};room.coin=Number.isFinite(Number(room.coin))?Number(room.coin):10;room.finalChoice=room.finalChoice||null;room.allies=room.allies||{};room.flags=room.flags||{};room.journal=room.journal||{people:{},clues:[],decisions:[],conclusions:[]};room.journal.people=room.journal.people||{};room.journal.clues=Array.isArray(room.journal.clues)?room.journal.clues:[];room.journal.decisions=Array.isArray(room.journal.decisions)?room.journal.decisions:[];room.journal.conclusions=Array.isArray(room.journal.conclusions)?room.journal.conclusions:[];room.chapter=Number(room.chapter||(legacySession?Math.min(6,legacySession+1):1));room.routeHistory=Array.isArray(room.routeHistory)?room.routeHistory:[];room.mapVisited=Array.isArray(room.mapVisited)?room.mapVisited:[];
+  room.items=Array.isArray(room.items)?room.items:[];room.itemUses=room.itemUses||{};room.coin=Number.isFinite(Number(room.coin))?Number(room.coin):10;room.finalChoice=room.finalChoice||null;room.allies=room.allies||{};room.flags=room.flags||{};room.journal=room.journal||{people:{},clues:[],decisions:[],conclusions:[],sideStories:[]};room.journal.people=room.journal.people||{};room.journal.clues=Array.isArray(room.journal.clues)?room.journal.clues:[];room.journal.decisions=Array.isArray(room.journal.decisions)?room.journal.decisions:[];room.journal.conclusions=Array.isArray(room.journal.conclusions)?room.journal.conclusions:[];room.journal.sideStories=Array.isArray(room.journal.sideStories)?room.journal.sideStories:[];room.chapter=Number(room.chapter||(legacySession?Math.min(6,legacySession+1):1));room.routeHistory=Array.isArray(room.routeHistory)?room.routeHistory:[];room.mapVisited=Array.isArray(room.mapVisited)?room.mapVisited:[];
   room.players=(room.players||[]).map(p=>({...p,background:backgrounds.includes(p.background)?p.background:'Outlander',portrait:[1,2,3].includes(Number(p.portrait))?Number(p.portrait):1,talent:p.talent||null,gear:p.gear||classGear[p.cls]||null,gearUpgrades:{attack:0,defense:0,serviceUses:0,condition:3,maxCondition:3,roadsteel:false,labels:[],...(p.gearUpgrades||{})},reputation:{protector:0,pathfinder:0,scholar:0,negotiator:0,maker:0,bold:0,...(p.reputation||{})},cluesSeen:p.cluesSeen||{},supportReady:p.supportReady!==false,interventionReady:p.interventionReady!==false,growth:Number(p.growth||0),skillPoints:Number(p.skillPoints||0),stats:{...emptyStats(),...(p.stats||{})},voiceJoined:false,voiceMuted:false,voiceSpeaking:false}));
   if(room.phase==='playing'||room.phase==='ended'){
     if(!Array.isArray(room.groups)||!room.groups.length) initMainGroup(room,room.scene||'intro');
@@ -174,9 +240,9 @@ function migrateRoom(room){
   delete room.birthdayBlessing;delete room.birthdayBlessingAvailable;delete room.birthdayChestOpened;delete room.session;delete room.sessionEnd;
   return room;
 }
-function serializeRoom(room){return {v:8,code:room.code,hostId:room.hostId,phase:room.phase,scene:primaryScene(room),chapter:room.chapter,activeIndex:room.activeIndex,round:room.round,hope:room.hope,threat:room.threat,supplies:room.supplies,relics:room.relics,coin:room.coin,flags:room.flags,items:room.items,itemUses:room.itemUses,allies:room.allies,ending:room.ending,finalChoice:room.finalChoice,log:room.log,journal:room.journal||{people:{},clues:[],decisions:[],conclusions:[]},mapVisited:room.mapVisited||[],routeHistory:room.routeHistory||[],groups:(room.groups||[]).map(g=>({...g,pending:null})),players:room.players.map(({socketId,connected,voiceJoined,voiceMuted,voiceSpeaking,...p})=>({...p,connected:false}))};}
+function serializeRoom(room){return {v:9,code:room.code,hostId:room.hostId,phase:room.phase,scene:primaryScene(room),chapter:room.chapter,activeIndex:room.activeIndex,round:room.round,hope:room.hope,threat:room.threat,supplies:room.supplies,relics:room.relics,coin:room.coin,flags:room.flags,items:room.items,itemUses:room.itemUses,allies:room.allies,ending:room.ending,finalChoice:room.finalChoice,log:room.log,journal:room.journal||{people:{},clues:[],decisions:[],conclusions:[]},mapVisited:room.mapVisited||[],routeHistory:room.routeHistory||[],groups:(room.groups||[]).map(g=>({...g,pending:null})),players:room.players.map(({socketId,connected,voiceJoined,voiceMuted,voiceSpeaking,...p})=>({...p,connected:false}))};}
 function encodeSave(room){return zlib.deflateRawSync(Buffer.from(JSON.stringify(serializeRoom(room)))).toString('base64url');}
-function decodeSave(token){try{const data=JSON.parse(zlib.inflateRawSync(Buffer.from(String(token||''),'base64url')).toString('utf8'));if(!data||![2,3,4,5,6,7,8].includes(data.v)||!Array.isArray(data.players)||!data.players.length)return null;return migrateRoom(data);}catch{return null;}}
+function decodeSave(token){try{const data=JSON.parse(zlib.inflateRawSync(Buffer.from(String(token||''),'base64url')).toString('utf8'));if(!data||![2,3,4,5,6,7,8,9].includes(data.v)||!Array.isArray(data.players)||!data.players.length)return null;return migrateRoom(data);}catch{return null;}}
 function emitCampaignSave(room){const host=getPlayer(room,room.hostId);if(host?.socketId)io.to(host.socketId).emit('campaignSave',{saveToken:encodeSave(room),scene:primaryScene(room),round:room.round,chapter:room.chapter,updatedAt:Date.now()});}
 function emitRoom(room){for(const p of room.players)if(p.socketId)io.to(p.socketId).emit('state',publicState(room,p.id));emitCampaignSave(room);}
 function emitContextClues(room,scene,playerIds=null){const clues=contextualClues[scene];if(!clues)return;const allowed=playerIds?new Set(playerIds):null;for(const p of room.players){if(allowed&&!allowed.has(p.id))continue;const txt=clues[p.cls]||clues[p.background];if(!txt||p.cluesSeen?.[scene]||!p.socketId)continue;p.cluesSeen=p.cluesSeen||{};p.cluesSeen[scene]=true;io.to(p.socketId).emit('secret',{title:`Only your ${p.cls} notices…`,text:txt});}}
@@ -195,7 +261,7 @@ function setbackConsequenceText(cfg,detail={}){
   }
   return bits.join(' · ');
 }
-function ensureJournal(room){room.journal=room.journal||{people:{},clues:[],decisions:[],conclusions:[]};room.journal.people=room.journal.people||{};room.journal.clues=Array.isArray(room.journal.clues)?room.journal.clues:[];room.journal.decisions=Array.isArray(room.journal.decisions)?room.journal.decisions:[];room.journal.conclusions=Array.isArray(room.journal.conclusions)?room.journal.conclusions:[];return room.journal;}
+function ensureJournal(room){room.journal=room.journal||{people:{},clues:[],decisions:[],conclusions:[],sideStories:[]};room.journal.people=room.journal.people||{};room.journal.clues=Array.isArray(room.journal.clues)?room.journal.clues:[];room.journal.decisions=Array.isArray(room.journal.decisions)?room.journal.decisions:[];room.journal.conclusions=Array.isArray(room.journal.conclusions)?room.journal.conclusions:[];room.journal.sideStories=Array.isArray(room.journal.sideStories)?room.journal.sideStories:[];return room.journal;}
 function journalPush(list,entry){if(!entry||!entry.id)return;if(!list.some(x=>x.id===entry.id))list.push(entry);}
 function resolvedDialogue(cfg,result,active){const success=result!=='setback'&&result!=='miss';const d=success?cfg.dialogueSuccess:cfg.dialogueFailure;if(!d)return null;let extra='';if(active?.cls&&d.classLines?.[active.cls])extra=d.classLines[active.cls];else if(active?.background&&d.backgroundLines?.[active.background])extra=d.backgroundLines[active.background];return {...d,extra};}
 function applyNarrativeMeta(room,cfg,success,active){ensureJournal(room);const d=success?cfg.dialogueSuccess:cfg.dialogueFailure;if(!d)return;const j=room.journal;if(d.person){j.people[d.person.id]={...(j.people[d.person.id]||{}),...d.person};}if(d.relationship){j.people[d.relationship.id]={...(j.people[d.relationship.id]||{}),id:d.relationship.id,name:d.relationship.name||d.relationship.id,status:d.relationship.status,note:d.relationship.note||''};room.flags['rel_'+d.relationship.id+'_'+String(d.relationship.status||'').replace(/\W+/g,'_').toLowerCase()]=true;}if(d.clue){journalPush(j.clues,d.clue);room.flags['clue_'+d.clue.id]=true;}if(d.decision)journalPush(j.decisions,d.decision);checkConclusions(room);}
@@ -274,7 +340,7 @@ function maybeWearGear(room,participants,cfg,success){
 }
 
 function newPlayer(socket,name,cls,room=null,background='Outlander',portrait=1){return {id:crypto.randomUUID(),socketId:socket.id,resumeToken:crypto.randomBytes(16).toString('hex'),returnPin:makeReturnPin(room),name,cls,background:backgrounds.includes(background)?background:'Outlander',portrait:[1,2,3].includes(Number(portrait))?Number(portrait):1,talent:null,stats:emptyStats(),gear:classGear[cls],gearUpgrades:{attack:0,defense:0,serviceUses:0,condition:3,maxCondition:3,roadsteel:false,labels:[]},reputation:{protector:0,pathfinder:0,scholar:0,negotiator:0,maker:0,bold:0},wounds:0,growth:0,skillPoints:0,supportReady:true,interventionReady:true,ready:false,connected:true,cluesSeen:{},groupId:'main',voiceJoined:false,voiceMuted:false,voiceSpeaking:false};}
-function newRoom(hostId){return migrateRoom({code:roomCode(),hostId,phase:'lobby',players:[],scene:'intro',chapter:1,activeIndex:0,round:1,hope:6,threat:0,supplies:6,relics:0,coin:10,flags:{},items:[],itemUses:{},allies:{},pending:null,lastRoll:null,ending:null,finalChoice:null,log:[],journal:{people:{},clues:[],decisions:[],conclusions:[]},groups:[],routeHistory:[],mapVisited:[]});}
+function newRoom(hostId){return migrateRoom({code:roomCode(),hostId,phase:'lobby',players:[],scene:'intro',chapter:1,activeIndex:0,round:1,hope:6,threat:0,supplies:6,relics:0,coin:10,flags:{},items:[],itemUses:{},allies:{},pending:null,lastRoll:null,ending:null,finalChoice:null,log:[],journal:{people:{},clues:[],decisions:[],conclusions:[],sideStories:[]},groups:[],routeHistory:[],mapVisited:[]});}
 function attachSocket(room,p,socket){if(p.socketId&&p.socketId!==socket.id){const old=io.sockets.sockets.get(p.socketId);if(old)old.disconnect(true);}p.socketId=socket.id;p.connected=true;p.voiceJoined=false;p.voiceMuted=false;p.voiceSpeaking=false;socket.data.roomCode=room.code;socket.data.playerId=p.id;socket.join(room.code);}
 function sendJoined(socket,room,p,event='joined'){socket.emit(event,{roomCode:room.code,playerId:p.id,resumeToken:p.resumeToken,returnPin:p.returnPin,isHost:room.hostId===p.id});}
 function hostOnly(room,socket){return room&&room.hostId===socket.data.playerId;}
@@ -394,6 +460,28 @@ io.on('connection', socket => {
   socket.on('hostSkipTurn',()=>{const room=rooms.get(socket.data.roomCode);if(!hostOnly(room,socket)||room.phase!=='playing')return;const g=activeGroup(room);if(g){g.pending=null;g.lastRoll=null;}nextTurn(room);emitRoom(room);});
   socket.on('hostResetChallenge',()=>{const room=rooms.get(socket.data.roomCode);if(!hostOnly(room,socket)||room.phase!=='playing')return;const g=activeGroup(room);if(g){g.pending=null;g.lastRoll=null;}emitRoom(room);});
   socket.on('hostRemovePlayer',({playerId})=>{const room=rooms.get(socket.data.roomCode);if(!hostOnly(room,socket))return;removeDisconnected(room,playerId);emitRoom(room);});
+
+  socket.on('resolveLostArchive',({storyId,choiceId})=>{
+    try{
+      const room=rooms.get(socket.data.roomCode),active=room&&activePlayer(room),group=room&&activeGroup(room);
+      if(!room||room.phase!=='playing'||!active||!group||active.id!==socket.data.playerId)return socket.emit('errorMsg','Only the active hero can resolve this side story.');
+      const st=lostArchiveFor(room,group);
+      if(!st||st.id!==storyId)return socket.emit('errorMsg','That side story is no longer available.');
+      const choice=st.choices.find(c=>c.id===choiceId);if(!choice)return socket.emit('errorMsg','Choose one of the available side-story options.');
+      const j=ensureJournal(room);
+      effect(room,{effects:choice.effects||{}},true);
+      if(choice.clue){journalPush(j.clues,choice.clue);room.flags['clue_'+choice.clue.id]=true;}
+      if(choice.decision)journalPush(j.decisions,choice.decision);
+      if(choice.rep)awardReputation(room,active,choice.rep,1);
+      awardGrowth(room,active,1,'exploring a Lost Archive');
+      const memory={id:st.id,title:st.title,nodeId:st.nodeId,scene:group.scene,hero:active.name,choice:choice.label,summary:choice.summary,round:room.round};
+      j.sideStories.push(memory);
+      checkConclusions(room);
+      addLog(room,`${active.name} explored ${st.title}: ${choice.label}.`);
+      emitToGroup(room,group,'lostArchiveOutcome',{title:st.title,summary:choice.summary,hero:active.name,choice:choice.label});
+      emitRoom(room);
+    }catch(err){console.error('[resolveLostArchive]',err);socket.emit('errorMsg','The side story hit a problem. Your main adventure is unchanged.');}
+  });
 
   socket.on('chooseAction',({action})=>{const room=rooms.get(socket.data.roomCode);if(!room||room.phase!=='playing')return;const active=activePlayer(room),group=activeGroup(room);if(!active||!group||active.id!==socket.data.playerId)return socket.emit('errorMsg','It is not your turn.');if(group.pending)return;const cfg=actionMap[group.scene]?.[action];if(!cfg)return;const unmet=requirementsMet(room,cfg);if(unmet)return socket.emit('errorMsg',unmet);
     if(cfg.type==='split'){if(group.playerIds.length<2){const target=cfg.soloScene||cfg.routes?.a?.scene;emitOutcome(room,outcomePayload(room,cfg,'instant',target,{},group),group);transition(room,target,group);nextTurn(room);emitRoom(room);return;}group.pending={...cfg,action,actingPlayerId:active.id,type:'split'};emitRoom(room);return;}

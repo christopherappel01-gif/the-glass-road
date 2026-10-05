@@ -237,6 +237,7 @@
         <div id="sceneArt" class="scene-art" role="img" aria-label="Story scene illustration"><img id="sceneArtMedia" class="scene-art__media hidden" alt="Scene illustration"><div class="scene-art__fx scene-art__fx-a"></div><div class="scene-art__fx scene-art__fx-b"></div><div class="scene-art__fx scene-art__fx-c"></div><div class="scene-art__icon"></div><div class="scene-art__caption"></div></div><div id="sceneKindBadge" class="scene-kind"></div><div id="passiveInsight" class="passive-insight hidden"></div><div id="itemCallback" class="item-callback hidden"></div><div id="battleState" class="battle-state hidden"></div><div id="npcMoment" class="npc-moment hidden"></div><div id="callbackPanel" class="callback-panel hidden"></div>
         <div id="storyBridge" class="story-bridge hidden"></div>
         <div id="sceneText" class="story"></div>
+        <div id="lostArchiveCard" class="lost-archive-card hidden"></div>
         <div id="turnNotice" class="turn-notice"></div>
         <div id="choices" class="choice-list"></div>
         <div id="challenge" class="hidden"></div>
@@ -284,6 +285,19 @@
   <div class="hero-sheet-card">
     <div class="hero-sheet-head"><div><div class="eyebrow">MY HERO</div><h2 id="heroSheetTitle">Character Sheet</h2></div><button id="heroSheetClose" class="btn btn-ghost btn-small" type="button">Close</button></div>
     <div id="heroSheetBody"></div>
+  </div>
+</div>
+
+<div id="lostArchiveModal" class="hero-sheet-modal hidden" role="dialog" aria-modal="true" aria-labelledby="lostArchiveTitle">
+  <div class="hero-sheet-card lost-archive-modal-card">
+    <div class="hero-sheet-head"><div><div class="eyebrow">LOST ARCHIVE · OPTIONAL SIDE STORY</div><h2 id="lostArchiveTitle">A story beside the Road</h2></div><button id="lostArchiveClose" class="btn btn-ghost btn-small" type="button">Close</button></div>
+    <div id="lostArchiveBody"></div>
+  </div>
+</div>
+<div id="journeyDetailModal" class="hero-sheet-modal hidden" role="dialog" aria-modal="true" aria-labelledby="journeyDetailTitle">
+  <div class="hero-sheet-card journey-detail-card">
+    <div class="hero-sheet-head"><div><div class="eyebrow">JOURNEY MEMORY</div><h2 id="journeyDetailTitle">Place</h2></div><button id="journeyDetailClose" class="btn btn-ghost btn-small" type="button">Close</button></div>
+    <div id="journeyDetailBody"></div>
   </div>
 </div>
 <div id="sceneReveal" class="scene-reveal hidden" aria-live="polite">
