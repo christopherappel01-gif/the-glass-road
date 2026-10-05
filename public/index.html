@@ -8,16 +8,6 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="language-switcher" aria-label="Language selector">
-  <label for="languageSelect">Language</label>
-  <select id="languageSelect">
-    <option value="en">English</option>
-    <option value="nl">Nederlands</option>
-    <option value="fr">Français</option>
-    <option value="de">Deutsch</option>
-  </select>
-  <span id="languageStatus" class="small muted"></span>
-</div>
 <main id="app">
   <section id="home" class="screen home-screen">
     <div class="hero-banner hero-banner--opening">
@@ -27,7 +17,7 @@
       </video>
       <div class="hero-banner__overlay"></div>
       <div class="hero-banner__content hero-banner__content--wide">
-        <div class="eyebrow">GM-LESS CO-OPERATIVE FANTASY RPG · 1–6 PLAYERS</div>
+        <div class="eyebrow">GM-LESS CO-OPERATIVE FANTASY ADVENTURE · 1–6 PLAYERS</div>
         <h1>The Glass Road</h1>
         <p class="hero-tagline">A shared adventure that remembers who you become.</p>
         <p class="hero-subtitle">A road of black glass has surfaced beneath a shattered frontier city. Create distinct heroes, uncover private clues, make hard choices together and push beyond the edge of the known maps — with no Game Master required.</p>
@@ -227,7 +217,16 @@
       <button class="btn btn-ghost btn-small menuBtn" type="button">← Main Menu</button>
       <div><div class="eyebrow">THE GLASS ROAD · THE FIRST CROSSING</div><h1 id="sceneTitle">Brackencliff After the Quake</h1></div>
       <div class="game-status">
-        <div class="sound-row"><button id="heroSheetBtn" class="btn btn-secondary-accent btn-small" type="button">🧭 My Hero</button> <button id="journalBtn" class="btn btn-ghost btn-small" type="button">📖 Journal</button> <button id="recapBtn" class="btn btn-ghost btn-small" type="button">↺ Recap</button> <button id="soundToggle" class="btn btn-ghost btn-small" type="button">🔊 SFX on</button> <button id="ambientToggle" class="btn btn-ghost btn-small" type="button">🌿 Ambience on</button> <button id="fullscreenBtn" class="btn btn-ghost btn-small" type="button">⛶ Full Screen</button></div>
+        <div class="sound-row"><button id="heroSheetBtn" class="btn btn-secondary-accent btn-small" type="button">🧭 My Hero</button> <button id="journalBtn" class="btn btn-ghost btn-small" type="button">📖 Journal</button> <button id="recapBtn" class="btn btn-ghost btn-small" type="button">↺ Recap</button> <button id="soundToggle" class="btn btn-ghost btn-small" type="button">🔊 SFX on</button> <button id="ambientToggle" class="btn btn-ghost btn-small" type="button">🌿 Ambience on</button> <button id="fullscreenBtn" class="btn btn-ghost btn-small" type="button">⛶ Full Screen</button> <div class="language-switcher" aria-label="Language selector">
+  <label for="languageSelect">Language</label>
+  <select id="languageSelect">
+    <option value="en">English</option>
+    <option value="nl">Nederlands</option>
+    <option value="fr">Français</option>
+    <option value="de">Deutsch</option>
+  </select>
+  <span id="languageStatus" class="small muted"></span>
+</div></div>
         <div class="room-mini">Room <strong id="gameRoom"></strong> · Your Return PIN <strong id="returnPinGame">----</strong></div>
         <div class="status-row"><span>Round <b id="round"></b></span><span>Hope <b id="hope"></b>/6</span><span>Threat <b id="threat"></b>/6</span></div>
       </div>
@@ -235,7 +234,7 @@
 
     <div class="game-grid">
       <section class="panel story-panel">
-        <div id="sceneArt" class="scene-art" role="img" aria-label="Story scene illustration"><img id="sceneArtMedia" class="scene-art__media hidden" alt="Scene illustration"><div class="scene-art__fx scene-art__fx-a"></div><div class="scene-art__fx scene-art__fx-b"></div><div class="scene-art__icon"></div><div class="scene-art__caption"></div></div><div id="sceneKindBadge" class="scene-kind"></div><div id="passiveInsight" class="passive-insight hidden"></div><div id="itemCallback" class="item-callback hidden"></div><div id="battleState" class="battle-state hidden"></div><div id="npcMoment" class="npc-moment hidden"></div><div id="callbackPanel" class="callback-panel hidden"></div>
+        <div id="sceneArt" class="scene-art" role="img" aria-label="Story scene illustration"><img id="sceneArtMedia" class="scene-art__media hidden" alt="Scene illustration"><div class="scene-art__fx scene-art__fx-a"></div><div class="scene-art__fx scene-art__fx-b"></div><div class="scene-art__fx scene-art__fx-c"></div><div class="scene-art__icon"></div><div class="scene-art__caption"></div></div><div id="sceneKindBadge" class="scene-kind"></div><div id="passiveInsight" class="passive-insight hidden"></div><div id="itemCallback" class="item-callback hidden"></div><div id="battleState" class="battle-state hidden"></div><div id="npcMoment" class="npc-moment hidden"></div><div id="callbackPanel" class="callback-panel hidden"></div>
         <div id="storyBridge" class="story-bridge hidden"></div>
         <div id="sceneText" class="story"></div>
         <div id="turnNotice" class="turn-notice"></div>

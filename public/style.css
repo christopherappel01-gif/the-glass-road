@@ -401,10 +401,11 @@ body .scene-art.receiver_threshold,body .scene-art.receiver_assault{min-height:4
 @media(max-width:700px){.scene-reveal__portrait{width:min(56vw,220px);max-height:24vh;top:5vh}.scene-reveal.spotlight-portrait{padding-top:calc(12vh + 130px)!important}.scene-reveal.spotlight-portrait .scene-reveal__content{padding:16px}}
 
 
-/* V1.9 quality pass */
-.language-switcher{position:fixed;top:10px;right:12px;z-index:10050;display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:12px;background:rgba(8,13,23,.88);border:1px solid rgba(95,111,143,.52);backdrop-filter:blur(8px);box-shadow:0 8px 26px rgba(0,0,0,.24)}
-.language-switcher label{margin:0;font-size:.72rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em}.language-switcher select{width:auto;min-height:34px;margin:0;padding:0 28px 0 9px;border-radius:8px;font-size:.82rem}.language-switcher #languageStatus{max-width:130px}
-@media(max-width:700px){.language-switcher{top:6px;right:6px;gap:4px;padding:5px 6px}.language-switcher label,.language-switcher #languageStatus{display:none}.language-switcher select{min-height:32px;font-size:.78rem}}
+/* V1.10 integrated language control */
+.language-switcher{position:static;z-index:auto;display:inline-flex;align-items:center;gap:6px;padding:0;margin:0 0 0 4px;background:transparent;border:0;box-shadow:none;backdrop-filter:none;vertical-align:middle}
+.language-switcher label{margin:0;font-size:.68rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em}.language-switcher select{width:auto;min-width:116px;min-height:38px;margin:0;padding:0 28px 0 9px;border-radius:9px;font-size:.80rem}.language-switcher #languageStatus{max-width:150px;font-size:.68rem;line-height:1.15}.game-topbar .sound-row{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end;align-items:center}
+@media(max-width:900px){.game-topbar .sound-row{justify-content:flex-start}.language-switcher{width:auto}.language-switcher #languageStatus{display:none}}
+@media(max-width:600px){.language-switcher label{display:none}.language-switcher select{min-width:108px;min-height:36px}}
 
 /* Scene art should be the art: no floating symbolic glyphs over it. */
 .scene-art__icon{display:none!important}
@@ -414,3 +415,22 @@ body .scene-art.receiver_threshold,body .scene-art.receiver_assault{min-height:4
 .scene-art:hover{background-position:center!important}
 
 .voice-network{margin-top:8px;line-height:1.35}.voice-network.ok{color:#9be3bc}.voice-network.warn{color:#e7c87a}.voice-network.bad{color:#f3a0a0}
+
+
+/* V1.10 stronger environmental motion — camera stays locked */
+.scene-art__fx-c{position:absolute;inset:0;pointer-events:none;z-index:2;opacity:0}
+.scene-art.scene-atmos-forest .scene-art__fx-a{opacity:.95!important;filter:blur(10px)!important;background:radial-gradient(ellipse at 18% 72%,rgba(228,238,240,.38),transparent 28%),radial-gradient(ellipse at 48% 60%,rgba(224,235,238,.34),transparent 34%),radial-gradient(ellipse at 78% 68%,rgba(232,239,241,.28),transparent 26%)!important;animation:forestMistStrong 11s ease-in-out infinite alternate!important}
+.scene-art.scene-atmos-forest .scene-art__fx-b{opacity:.30!important;animation:forestWindStrong 7.5s ease-in-out infinite alternate!important}
+.scene-art.scene-atmos-mountain .scene-art__fx-a{opacity:.90!important;filter:blur(10px)!important;background:radial-gradient(ellipse at 62% 17%,rgba(245,248,250,.36),transparent 25%),radial-gradient(ellipse at 82% 26%,rgba(239,244,247,.30),transparent 22%),radial-gradient(ellipse at 45% 20%,rgba(238,244,247,.20),transparent 20%)!important;animation:mountainCloudsStrong 12s ease-in-out infinite alternate!important}
+.scene-art.scene-atmos-river .scene-art__fx-a{opacity:.86!important;animation:riverMistStrong 12s ease-in-out infinite alternate!important}
+.scene-art.scene-atmos-river .scene-art__fx-b{opacity:.28!important;animation:riverShimmerStrong 7s ease-in-out infinite alternate!important}
+.scene-art.charcoal_camp .scene-art__fx-c,.scene-art.hollowmere .scene-art__fx-c,.scene-art.hollow_inn .scene-art__fx-c,.scene-art.farmstead .scene-art__fx-c{opacity:.92;background:radial-gradient(ellipse at 22% 72%,rgba(225,225,220,.42) 0 5%,transparent 18%),radial-gradient(ellipse at 37% 64%,rgba(235,232,224,.34) 0 4%,transparent 16%),radial-gradient(ellipse at 63% 58%,rgba(226,228,226,.26) 0 4%,transparent 16%);filter:blur(9px);animation:chimneySmokeRise 7.5s linear infinite}
+.scene-art.hollowmere .scene-art__fx-c,.scene-art.hollow_inn .scene-art__fx-c{background:radial-gradient(ellipse at 18% 70%,rgba(236,235,232,.38) 0 4%,transparent 15%),radial-gradient(ellipse at 42% 66%,rgba(233,233,230,.34) 0 4%,transparent 15%),radial-gradient(ellipse at 72% 70%,rgba(230,232,232,.28) 0 4%,transparent 15%)}
+.scene-art.scene-atmos-danger .scene-art__fx-a{opacity:.68!important}.scene-art.scene-atmos-danger .scene-art__fx-b{opacity:.28!important}
+@keyframes forestMistStrong{0%{transform:translateX(-7%) translateY(2%)}100%{transform:translateX(7%) translateY(-3%)}}
+@keyframes forestWindStrong{0%{transform:translateX(-2%) skewX(-1deg)}100%{transform:translateX(2%) skewX(1deg)}}
+@keyframes mountainCloudsStrong{0%{transform:translateX(-6%) translateY(1%)}100%{transform:translateX(6%) translateY(3%)}}
+@keyframes riverMistStrong{0%{transform:translateX(-7%) translateY(1%)}100%{transform:translateX(7%) translateY(-2%)}}
+@keyframes riverShimmerStrong{0%{transform:translateX(-5%);opacity:.16}100%{transform:translateX(5%);opacity:.34}}
+@keyframes chimneySmokeRise{0%{transform:translateY(18%) translateX(-2%) scale(.88);opacity:.18}30%{opacity:.88}70%{opacity:.64}100%{transform:translateY(-34%) translateX(8%) scale(1.30);opacity:0}}
+@media(prefers-reduced-motion:reduce){.scene-art__fx-c{animation:none!important}}

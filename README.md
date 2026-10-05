@@ -1,22 +1,50 @@
 # The Glass Road — The First Crossing
 
-**V1.9.0 — Slow Cinematic Landing + Spotlight Fix Build**
+**V1.10.0 — Stability, Accessibility & Story Polish Build**
 
-This build rolls all current fixes and visual upgrades into one clean playtest package.
+This is the consolidated playtest build after the October 2026 two-player review.
 
-## What changed in this build
+## Main fixes in V1.10.0
 
-- Full high-quality art pass across the game from top to bottom.
-- Upgraded the remaining earlier scene art so the full journey now uses HQ environments.
-- Replaced all selectable hero portraits with a new premium portrait set.
-- Replaced core named NPC portraits with new premium portrait art.
-- Converted art assets to **WebP** for better image quality-per-file-size and quicker loading.
-- Keeps earlier fixes already made during iteration:
-  - Render stability improvements
-  - hero portrait loading fixes
-  - dice roll reliability fix
-  - persistent closable hints / private insight boxes
-  - compact package cleanup
+- **Language control layout:** the language selector now sits inside the normal game toolbar rather than floating over other controls.
+- **Translation behaviour:** Dutch, French and German now translate the current game screen as one unit. If a full translation is not available, the game keeps that screen in English instead of leaving it half-translated.
+- **High-road split crash:** the first route to reach the reunion point now enters a real “Waiting at the Rendezvous” scene. This fixes the missing-scene crash that could hit one side of a split while the other side kept playing.
+- **NPC portraits:** secondary NPCs no longer reuse the selectable hero portraits. Dedicated portraits are included for Beren Quill, the Lantern Inn keeper, the archive clerk, Edda Varn, the shepherd, Lowwater elder and Rook's scout, alongside the existing named NPC art.
+- **Voice reliability:** WebRTC now reports real connection state, retries once with an ICE restart, and supports TURN relays. Direct browser-to-browser voice may still fail across some routers; TURN is the production fix.
+- **Audio silence:** SFX and ambience start off by default. When both are off, the game stops ambience nodes and suspends the game audio context so no low background hum should remain. Voice analysis uses a separate context.
+- **Environmental motion:** the camera stays locked while forest mist, river haze, mountain clouds, settlement smoke and Road-energy effects move more visibly. Camp/settlement scenes include a stronger rising-smoke layer.
+- **Story copy:** spelling/grammar was cleaned up and RPG-heavy wording was simplified. Player-facing terms such as Broken Span, receiver, handoff, infrastructure and control channels were replaced with clearer language such as Broken Bridge, far tower, taking turns, signals and keeping the crossing open. Internal IDs remain unchanged for save compatibility.
+- **Friendlier mechanics wording:** several labels now say “Roll together”, “Quick roll”, “Solo roll”, “Work together” and “Help available” rather than RPG shorthand.
+
+## Translation setup
+
+English always works with no external service. The browser will use its on-device Translator API when available. For dependable full Dutch/French/German translation on Render, add:
+
+- `DEEPL_API_KEY`
+
+Optional:
+
+- `DEEPL_API_URL` — only needed if you want to override the automatic DeepL Free/Pro endpoint selection.
+
+The game intentionally avoids a half-translated screen: if full translation cannot be completed, that screen stays in English and the toolbar shows a short status message.
+
+## Voice setup
+
+Direct WebRTC voice is kept as a fallback, but reliable internet voice needs a TURN relay. Add these Render environment variables from your TURN provider:
+
+- `TURN_URL` — one or more comma-separated `turn:` / `turns:` URLs
+- `TURN_USERNAME`
+- `TURN_CREDENTIAL`
+
+Without TURN, the UI explicitly says that direct voice may fail on some home, mobile or work networks.
+
+## Deployment
+
+Deploy on Render as a **Web Service**.
+
+- Runtime: Node 20
+- Build command: `npm install`
+- Start command: `npm start`
 
 ## Package contents
 
@@ -26,88 +54,4 @@ This build rolls all current fixes and visual upgrades into one clean playtest p
 - `server.js`
 - `public/`
 
-## Deployment
-
-Deploy on Render as a **Web Service**.
-
-- Runtime: **Node 20**
-- Build command: `npm install`
-- Start command: `npm start`
-
-## Notes
-
-- All core visual assets used by the game are now in `public/assets/` as optimized **WebP** files (except the home SVG icon).
-- This build is intended as the **high-quality stress-test candidate**.
-
-
-## Flagship animation pass
-
-- **Phase A:** animated landing-page hero with cinematic drift, mist and glow overlays.
-- **Phase B:** built-in animated story-beats montage on the home screen.
-- **Phase C:** upgraded scene reveals and in-game chapter art motion.
-- **Phase D:** animated class portrait gallery plus subtle portrait motion throughout the interface.
-
-
-## V1.9.0 refinements
-
-- Simplified the landing page again by removing the extra cinematic-story and animated-hero promo sections.
-- Added an **actual looping animated hero image** for the main landing-page artwork.
-- Shifted the motion emphasis into the **story moments themselves** using atmospheric overlays: moving forest mist, soft tree sway, drifting mountain cloud, river haze, danger pulses, and settlement smoke/light.
-
-
-## V1.9.0 refinements
-
-- Replaced the quicker animated landing image with a **12-second muted looping video** with near-static framing, slow cloud drift and forest mist.
-- Removed the noticeable fast zoom-in / zoom-out effect from the landing presentation.
-- Fixed hero/reputation spotlight pop-ups (including **Trusted Voice**) so portrait artwork is displayed at a contained, screen-safe size instead of being blown up as a full-screen crop.
-
-
-## V1.9.0 major scene loops
-
-- Added **actual animated environment loops** for the main story moments rather than only overlay motion.
-- The major scenes now use dedicated animated WebP loops integrated directly into the story panel:
-  - Brackencliff / Discovery
-  - Pine Road
-  - Charcoal Camp
-  - Stag Stones
-  - River Road
-  - Lowwater
-  - Broken Span
-  - Tone Beneath the Bridge
-  - Hollowmere
-  - Mountain Pass
-  - Under the Mountain
-  - Final View
-- Kept the landing page simple and updated the landing animation to a slower, calmer loop.
-- Reduced the spotlight / Trusted Voice portrait scaling so those popups stay screen-safe.
-
-
-## V1.9.0 fixes
-
-- Fixed the **Trusted Voice / spotlight** portrait so it displays as a contained portrait card instead of behaving like an oversized background image.
-- Slowed the landing page hero loop by roughly **half** for a calmer in-and-out motion.
-
-
-## V1.9.0 quality pass
-
-### Environment animation
-- Removed the floating scene glyphs (including the white diamond) from story artwork.
-- Locked the scene camera so the entire picture no longer shakes or drifts.
-- Re-rendered the major animated story moments with movement inside the world: forest mist, subtle canopy sway, river haze/shimmer, mountain cloud drift, settlement smoke/light, Road energy pulses and under-mountain glow.
-- Kept the slower landing-page loop from V1.8.1.
-
-### Voice chat
-- Voice now reports actual peer-link status instead of only saying that players joined the voice room.
-- Added TURN-relay support for reliable browser-to-browser audio across different routers/mobile networks.
-- The game still falls back to STUN/direct WebRTC when TURN is not configured, but the UI clearly labels that as direct-only.
-- For production voice on Render, set these environment variables from your TURN provider:
-  - `TURN_URL` (one or more comma-separated `turn:` / `turns:` URLs)
-  - `TURN_USERNAME`
-  - `TURN_CREDENTIAL`
-
-### Dutch / French / German
-- Added a per-player language selector: English, Nederlands, Français, Deutsch.
-- Each browser translates its own story narration, mission and choice text independently. Other players can remain in English or choose another language.
-- On browsers that provide the on-device Translator API, translation can happen locally.
-- A server fallback is included using DeepL when `DEEPL_API_KEY` is configured in Render. Translation results are cached in the browser for smoother repeat play.
-- If neither an on-device translator nor DeepL is available, the game safely leaves the English text in place and reports `Translator unavailable` rather than breaking play.
+All core visual assets are stored in `public/assets/`.
