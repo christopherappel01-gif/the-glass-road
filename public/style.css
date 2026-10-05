@@ -399,3 +399,18 @@ body .scene-art.receiver_threshold,body .scene-art.receiver_assault{min-height:4
 .scene-reveal.spotlight-portrait .scene-reveal__content{position:relative;z-index:3;width:min(700px,calc(100% - 24px));margin-bottom:2vh}
 @media(max-width:900px){.scene-reveal__portrait{width:min(38vw,240px);max-height:28vh}.scene-reveal.spotlight-portrait{padding-top:calc(14vh + 160px)!important}}
 @media(max-width:700px){.scene-reveal__portrait{width:min(56vw,220px);max-height:24vh;top:5vh}.scene-reveal.spotlight-portrait{padding-top:calc(12vh + 130px)!important}.scene-reveal.spotlight-portrait .scene-reveal__content{padding:16px}}
+
+
+/* V1.9 quality pass */
+.language-switcher{position:fixed;top:10px;right:12px;z-index:10050;display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:12px;background:rgba(8,13,23,.88);border:1px solid rgba(95,111,143,.52);backdrop-filter:blur(8px);box-shadow:0 8px 26px rgba(0,0,0,.24)}
+.language-switcher label{margin:0;font-size:.72rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em}.language-switcher select{width:auto;min-height:34px;margin:0;padding:0 28px 0 9px;border-radius:8px;font-size:.82rem}.language-switcher #languageStatus{max-width:130px}
+@media(max-width:700px){.language-switcher{top:6px;right:6px;gap:4px;padding:5px 6px}.language-switcher label,.language-switcher #languageStatus{display:none}.language-switcher select{min-height:32px;font-size:.78rem}}
+
+/* Scene art should be the art: no floating symbolic glyphs over it. */
+.scene-art__icon{display:none!important}
+
+/* Lock the camera. Animated files provide atmosphere; the panel itself must not shake. */
+.scene-art,.scene-art.scene-motion-road,.scene-art.scene-motion-travel,.scene-art.scene-motion-danger,.scene-art.scene-motion-settlement,.scene-art.scene-motion-mountain,.scene-art.scene-motion-final{animation:none!important;transform:none!important;background-position:center!important}
+.scene-art:hover{background-position:center!important}
+
+.voice-network{margin-top:8px;line-height:1.35}.voice-network.ok{color:#9be3bc}.voice-network.warn{color:#e7c87a}.voice-network.bad{color:#f3a0a0}

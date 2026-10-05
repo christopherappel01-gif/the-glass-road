@@ -16,6 +16,32 @@ server.keepAliveTimeout = 65000;
 server.headersTimeout = 66000;
 process.on('unhandledRejection', (err) => console.error('[unhandledRejection]', err));
 process.on('uncaughtException', (err) => console.error('[uncaughtException]', err));
+app.use(express.json({limit:'100kb'}));
+app.get('/voice-config', (req,res)=>{
+  const iceServers=[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun2.l.google.com:19302']}];
+  const turnUrls=String(process.env.TURN_URL||'').split(',').map(x=>x.trim()).filter(Boolean);
+  if(turnUrls.length&&process.env.TURN_USERNAME&&process.env.TURN_CREDENTIAL){
+    iceServers.push({urls:turnUrls,username:process.env.TURN_USERNAME,credential:process.env.TURN_CREDENTIAL});
+  }
+  res.json({iceServers,relayAvailable:iceServers.length>1});
+});
+const translationCache=new Map();
+app.post('/api/translate', async(req,res)=>{
+  const text=String(req.body?.text||'').trim();
+  const target=String(req.body?.target||'').toLowerCase();
+  if(!text||text.length>5000||!['nl','fr','de'].includes(target))return res.status(400).json({error:'Invalid translation request'});
+  const key=`${target}|${text}`;if(translationCache.has(key))return res.json({text:translationCache.get(key),provider:'cache'});
+  const apiKey=process.env.DEEPL_API_KEY;
+  if(!apiKey)return res.status(503).json({error:'Server translation is not configured'});
+  try{
+    const endpoint=String(process.env.DEEPL_API_URL|| (apiKey.endsWith(':fx')?'https://api-free.deepl.com/v2/translate':'https://api.deepl.com/v2/translate'));
+    const body=new URLSearchParams({text,source_lang:'EN',target_lang:target.toUpperCase()});
+    const r=await fetch(endpoint,{method:'POST',headers:{Authorization:`DeepL-Auth-Key ${apiKey}`,'Content-Type':'application/x-www-form-urlencoded'},body});
+    if(!r.ok)throw new Error(`DeepL ${r.status}`);const data=await r.json();const translated=data?.translations?.[0]?.text;
+    if(!translated)throw new Error('No translation returned');translationCache.set(key,translated);if(translationCache.size>1500)translationCache.delete(translationCache.keys().next().value);
+    res.json({text:translated,provider:'deepl'});
+  }catch(err){console.error('[translation]',err);res.status(502).json({error:'Translation service unavailable'});}
+});
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/health', (req, res) => res.status(200).send('ok'));
 

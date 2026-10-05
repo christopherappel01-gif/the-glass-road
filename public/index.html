@@ -8,6 +8,16 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class="language-switcher" aria-label="Language selector">
+  <label for="languageSelect">Language</label>
+  <select id="languageSelect">
+    <option value="en">English</option>
+    <option value="nl">Nederlands</option>
+    <option value="fr">Français</option>
+    <option value="de">Deutsch</option>
+  </select>
+  <span id="languageStatus" class="small muted"></span>
+</div>
 <main id="app">
   <section id="home" class="screen home-screen">
     <div class="hero-banner hero-banner--opening">
@@ -205,7 +215,7 @@
 
       <section class="panel company-panel">
         <div class="section-heading"><div><div class="eyebrow">THE COMPANY</div><h2>Players in Room</h2></div><span id="playerCount" class="count-badge">1 / 6</span></div>
-        <div id="lobbyPlayers" class="player-list"></div><div id="voiceLobby" class="voice-panel-mini"><div class="voice-panel-head"><b>🎙 Voice Chat</b><span id="voiceLobbyStatus" class="small muted">Optional</span></div><div class="voice-controls"><button class="btn btn-secondary-accent btn-small voiceJoinBtn" type="button">Join Voice</button><button class="btn btn-ghost btn-small voiceMuteBtn hidden" type="button">Mute</button><button class="btn btn-ghost btn-small voiceLeaveBtn hidden" type="button">Leave</button></div><div id="voiceLobbyList" class="voice-list small"></div></div>
+        <div id="lobbyPlayers" class="player-list"></div><div id="voiceLobby" class="voice-panel-mini"><div class="voice-panel-head"><b>🎙 Voice Chat</b><span id="voiceLobbyStatus" class="small muted">Optional</span></div><div class="voice-controls"><button class="btn btn-secondary-accent btn-small voiceJoinBtn" type="button">Join Voice</button><button class="btn btn-ghost btn-small voiceMuteBtn hidden" type="button">Mute</button><button class="btn btn-ghost btn-small voiceLeaveBtn hidden" type="button">Leave</button></div><div id="voiceLobbyList" class="voice-list small"></div><div id="voiceLobbyNetwork" class="voice-network small muted"></div></div>
         <div id="lobbyHint" class="waiting-box"></div>
         <button id="startBtn" class="btn btn-success btn-large full hidden">Begin the Crossing</button>
       </section>
@@ -236,7 +246,7 @@
       </section>
 
       <aside class="sidebar">
-        <section class="panel voice-panel"><div class="section-heading"><div><div class="eyebrow">OPTIONAL</div><h2>🎙 Voice Chat</h2></div><span id="voiceGameStatus" class="small muted">Not connected</span></div><div class="voice-controls"><button class="btn btn-secondary-accent btn-small voiceJoinBtn" type="button">Join Voice</button><button class="btn btn-ghost btn-small voiceMuteBtn hidden" type="button">Mute</button><button class="btn btn-ghost btn-small voiceLeaveBtn hidden" type="button">Leave</button></div><div id="voiceGameList" class="voice-list small"></div><p class="small muted voice-note">Voice is optional and separate from game sounds.</p></section>
+        <section class="panel voice-panel"><div class="section-heading"><div><div class="eyebrow">OPTIONAL</div><h2>🎙 Voice Chat</h2></div><span id="voiceGameStatus" class="small muted">Not connected</span></div><div class="voice-controls"><button class="btn btn-secondary-accent btn-small voiceJoinBtn" type="button">Join Voice</button><button class="btn btn-ghost btn-small voiceMuteBtn hidden" type="button">Mute</button><button class="btn btn-ghost btn-small voiceLeaveBtn hidden" type="button">Leave</button></div><div id="voiceGameList" class="voice-list small"></div><div id="voiceGameNetwork" class="voice-network small muted"></div><p class="small muted voice-note">Voice is optional and separate from game sounds.</p></section>
         <section class="panel"><div class="section-heading"><div><div class="eyebrow">PARTY</div><h2>Company</h2></div></div><div id="party" class="player-list"></div></section>
         <section class="panel mission-card"><div class="eyebrow">CURRENT MISSION</div><h2>Objective</h2><p id="mission"></p><div class="resource-row"><span>🎒 Supplies <b id="supplies"></b></span><span>🜂 Finds <b id="relics"></b></span><span>◉ Coin <b id="coin"></b></span></div><div id="pressureNote" class="pressure-note low"></div></section>
         <section class="panel inventory-card"><div class="eyebrow">EXPEDITION PACK</div><h2>Special Items</h2><div id="inventory" class="inventory-list"></div></section>

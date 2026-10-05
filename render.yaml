@@ -6,3 +6,12 @@ services:
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /health
+    envVars:
+      - key: TURN_URL
+        sync: false
+      - key: TURN_USERNAME
+        sync: false
+      - key: TURN_CREDENTIAL
+        sync: false
+      - key: DEEPL_API_KEY
+        sync: false

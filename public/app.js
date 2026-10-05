@@ -63,7 +63,9 @@ let audioOn=true,ambientOn=readJson('glassRoadAmbient')!==false,lastSceneSeen=nu
 let ambientScene=null,ambientMaster=null,ambientNodes=[],ambientTimer=null;
 let voiceJoined=false,voiceMuted=false,localVoiceStream=null,voiceAnalyserFrame=null,localSpeaking=false;
 const voicePeers=new Map(),voiceSpeaking=new Map();
-const voiceRtcConfig={iceServers:[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']}]};
+let voiceRtcConfig={iceServers:[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun2.l.google.com:19302']}]};
+let voiceRelayAvailable=false;
+const voiceConnectionStates=new Map();
 let sessionInfo=readJson('glassRoadSession');
 let campaignSave=readJson('glassRoadCampaign');
 let privateClues=[];
@@ -71,6 +73,59 @@ let autoResumeTried=false;
 function readJson(key){try{return JSON.parse(localStorage.getItem(key)||'null')}catch{return null}}
 function writeJson(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}}
 function clearKey(key){try{localStorage.removeItem(key)}catch{}}
+
+const languageNames={en:'English',nl:'Nederlands',fr:'Français',de:'Deutsch'};
+let currentLanguage=readJson('glassRoadLanguage')||'en';
+let translationToken=0,translatorInstance=null,translatorLang='';
+const translationCache=new Map();
+const uiPhrases={
+  'Join Voice':{nl:'Stemchat starten',fr:'Rejoindre le vocal',de:'Sprachchat beitreten'},
+  'Mute':{nl:'Dempen',fr:'Couper le micro',de:'Stummschalten'},
+  'Unmute':{nl:'Dempen opheffen',fr:'Rétablir le micro',de:'Stummschaltung aufheben'},
+  'Leave':{nl:'Verlaten',fr:'Quitter',de:'Verlassen'},
+  'Voice Chat':{nl:'Stemchat',fr:'Chat vocal',de:'Sprachchat'},
+  'Not connected':{nl:'Niet verbonden',fr:'Non connecté',de:'Nicht verbunden'},
+  'Optional':{nl:'Optioneel',fr:'Facultatif',de:'Optional'},
+  'My Hero':{nl:'Mijn held',fr:'Mon héros',de:'Mein Held'},
+  'Journal':{nl:'Dagboek',fr:'Journal',de:'Journal'},
+  'Recap':{nl:'Samenvatting',fr:'Récapitulatif',de:'Rückblick'},
+  'Full Screen':{nl:'Volledig scherm',fr:'Plein écran',de:'Vollbild'},
+  'Company':{nl:'Gezelschap',fr:'Compagnie',de:'Gruppe'},
+  'Objective':{nl:'Doel',fr:'Objectif',de:'Ziel'},
+  'Special Items':{nl:'Speciale voorwerpen',fr:'Objets spéciaux',de:'Besondere Gegenstände'},
+  'Map of the First Crossing':{nl:'Kaart van de Eerste Oversteek',fr:'Carte de la Première Traversée',de:'Karte der Ersten Überquerung'},
+  'Begin the Crossing':{nl:'Begin de oversteek',fr:'Commencer la traversée',de:'Überquerung beginnen'},
+  'Create Adventure':{nl:'Avontuur maken',fr:'Créer une aventure',de:'Abenteuer erstellen'},
+  'Join Adventure':{nl:'Avontuur betreden',fr:'Rejoindre une aventure',de:'Abenteuer beitreten'},
+  'Continue':{nl:'Doorgaan',fr:'Continuer',de:'Weiter'},
+  'Close':{nl:'Sluiten',fr:'Fermer',de:'Schließen'},
+  'PARTY':{nl:'GROEP',fr:'GROUPE',de:'GRUPPE'},
+  'CURRENT MISSION':{nl:'HUIDIGE MISSIE',fr:'MISSION ACTUELLE',de:'AKTUELLE MISSION'},
+  'EXPEDITION PACK':{nl:'EXPEDITIEPAKKET',fr:'SAC D’EXPÉDITION',de:'EXPEDITIONSGEPÄCK'},
+  'JOURNEY SO FAR':{nl:'REIS TOT NU TOE',fr:'PARCOURS JUSQU’ICI',de:'BISHERIGE REISE'}
+};
+async function loadVoiceConfig(){
+  try{const r=await fetch('/voice-config',{cache:'no-store'});if(!r.ok)return;const cfg=await r.json();if(Array.isArray(cfg.iceServers)&&cfg.iceServers.length)voiceRtcConfig={iceServers:cfg.iceServers,iceCandidatePoolSize:4};voiceRelayAvailable=!!cfg.relayAvailable;renderVoiceUi();}catch{}
+}
+function setLanguageStatus(msg=''){const el=$('languageStatus');if(el)el.textContent=msg;}
+async function getBrowserTranslator(target){
+  if(target==='en')return null;
+  try{const T=window.Translator;if(!T?.create)return null;if(translatorInstance&&translatorLang===target)return translatorInstance;if(T.availability){const a=await T.availability({sourceLanguage:'en',targetLanguage:target});if(a==='unavailable')return null;}translatorInstance=await T.create({sourceLanguage:'en',targetLanguage:target,monitor(m){m.addEventListener?.('downloadprogress',e=>setLanguageStatus(`Downloading ${Math.round((e.loaded||0)*100)}%`));}});translatorLang=target;return translatorInstance;}catch{return null;}
+}
+async function translateText(text,target=currentLanguage){
+  const source=String(text||'').trim();if(!source||target==='en')return source;const key=`${target}|${source}`;if(translationCache.has(key))return translationCache.get(key);const stored=readJson('glassRoadTranslations')||{};if(stored[key]){translationCache.set(key,stored[key]);return stored[key];}
+  let out='';const local=await getBrowserTranslator(target);if(local){try{out=await local.translate(source);}catch{out='';}}
+  if(!out){try{const r=await fetch('/api/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:source,target})});if(r.ok)out=(await r.json()).text||'';}catch{}}
+  if(out){translationCache.set(key,out);stored[key]=out;if(Object.keys(stored).length>900){for(const k of Object.keys(stored).slice(0,150))delete stored[k];}writeJson('glassRoadTranslations',stored);return out;}setLanguageStatus('Translator unavailable');return source;
+}
+function translateStaticUi(){
+  const lang=currentLanguage;document.querySelectorAll('button,h2,.eyebrow,.voice-note,.home-footnote,.hero-banner__microcopy').forEach(el=>{if(el.closest('#sceneText,#choices,#npcMoment,#callbackPanel,#challenge,#rollResult,#secret'))return;if(!el.dataset.i18nSource)el.dataset.i18nSource=el.textContent.trim();const src=el.dataset.i18nSource,hit=uiPhrases[src]?.[lang];if(lang==='en')el.textContent=src;else if(hit)el.textContent=hit;});
+}
+async function translateCurrentStory(){
+  const token=++translationToken,lang=currentLanguage;if(lang==='en')return;setLanguageStatus('Translating…');const jobs=[];const push=el=>{if(!el)return;const src=el.dataset.translateSource||el.textContent.trim();if(!src)return;el.dataset.translateSource=src;jobs.push((async()=>{const out=await translateText(src,lang);if(token===translationToken&&currentLanguage===lang)el.textContent=out;})());};
+  push($('sceneTitle'));push($('mission'));document.querySelectorAll('#sceneText p,#storyBridge p,#choices .choice b,#choices .choice span,#npcMoment p,#callbackPanel p,#passiveInsight p,#secret p').forEach(push);await Promise.allSettled(jobs);if(token===translationToken)setLanguageStatus('');
+}
+function setupLanguageSelector(){const sel=$('languageSelect');if(!sel)return;sel.value=currentLanguage;sel.onchange=()=>{currentLanguage=sel.value;writeJson('glassRoadLanguage',currentLanguage);translatorInstance=null;translatorLang='';translationToken++;translateStaticUi();if(state?.phase==='playing'){lastRenderedScene=null;renderGame();setTimeout(translateCurrentStory,20);}setLanguageStatus(currentLanguage==='en'?'':languageNames[currentLanguage]);};translateStaticUi();}
 function clueStorageKey(code=roomCode,id=me){return code&&id?`glassRoadClues_${code}_${id}`:null}
 function loadPrivateClues(code=roomCode,id=me){const key=clueStorageKey(code,id);privateClues=key?(readJson(key)||[]):[];return privateClues}
 function savePrivateClues(){const key=clueStorageKey();if(key)writeJson(key,privateClues)}
@@ -475,11 +530,12 @@ function duckAmbience(){if(!ambientMaster)return;const anyone=localSpeaking||[..
 function renderGame(){
   show('game');const sc=scenes[state.scene];if(!sc)return;updateAmbience(state.scene);renderVoiceUi();syncVoicePeers();
   if(lastRenderedScene!==state.scene){const artBox=$('sceneArt');if(artBox){artBox.classList.remove('scene-enter');void artBox.offsetWidth;artBox.classList.add('scene-enter');}const story=document.querySelector('.story-panel');if(story){story.classList.remove('story-step');void story.offsetWidth;story.classList.add('story-step');}lastRenderedScene=state.scene;}
-  $('sceneTitle').textContent=sc.title;$('sceneText').innerHTML=sc.text.map(x=>`<p>${x}</p>`).join('')+(state.scene==='intro'?openingCompanyHtml():'');$('mission').textContent=sc.mission;const bridge=$('storyBridge');if(bridge){if(pendingStoryBridge&&pendingStoryBridge.scene===state.scene){bridge.innerHTML=`<p>${esc(pendingStoryBridge.text)}</p>`;bridge.classList.remove('hidden');}else bridge.classList.add('hidden');}
+  $('sceneTitle').textContent=sc.title;$('sceneTitle').dataset.translateSource=sc.title;$('sceneText').innerHTML=sc.text.map(x=>`<p>${x}</p>`).join('')+(state.scene==='intro'?openingCompanyHtml():'');$('mission').textContent=sc.mission;$('mission').dataset.translateSource=sc.mission;const bridge=$('storyBridge');if(bridge){if(pendingStoryBridge&&pendingStoryBridge.scene===state.scene){bridge.innerHTML=`<p>${esc(pendingStoryBridge.text)}</p>`;bridge.classList.remove('hidden');}else bridge.classList.add('hidden');}
   const art=sceneArt[state.scene]||['🧭',sc.title],image=sceneImages[state.scene]||'assets/glass_home.svg',loopImage=sceneLoops[state.scene]||'';const [icon,caption]=art;const artBox=$('sceneArt'),media=$('sceneArtMedia');artBox.className=`scene-art ${state.scene} ${sceneMotionClass(state.scene)} ${sceneAtmosClass(state.scene)} ${loopImage?'has-media':''}`;artBox.style.backgroundImage=`linear-gradient(0deg,rgba(5,10,18,.76),rgba(5,10,18,.08)),url('${image}')`;if(media){if(loopImage){if(media.getAttribute('src')!==loopImage)media.setAttribute('src',loopImage);media.classList.remove('hidden');}else{media.classList.add('hidden');media.removeAttribute('src');}}artBox.querySelector('.scene-art__icon').textContent=icon;artBox.querySelector('.scene-art__caption').textContent=caption;renderNpcMoment(state.scene);renderFinaleCallbacks(state.scene);renderQualityPanels(state.scene);
   $('round').textContent=state.round;$('hope').textContent=state.hope;$('threat').textContent=state.threat;$('supplies').textContent=state.supplies;$('relics').textContent=state.relics;if($('coin'))$('coin').textContent=state.coin??0;if($('pressureNote')){$('pressureNote').textContent=threatStatusText(state.threat);$('pressureNote').className='pressure-note '+(state.threat>=5?'high':state.threat>=3?'mid':'low');}
   const active=state.players[state.activeIndex],mine=active?.id===me,waiting=(state.groups||[]).find(g=>g.id===state.currentGroupId)?.waitingMerge;$('turnNotice').className='turn-notice'+(mine?' mine':'');$('turnNotice').innerHTML=waiting?`<b>${esc(state.currentGroupName||'Your group')} has reached the rendezvous.</b> The other group is still on its route.`:mine?`<b>Your turn, ${esc(active.name)}.</b> Choose what your hero does next.${state.groups?.length>1?` <span class="group-badge">${esc(state.currentGroupName)}</span>`:''}`:`Waiting for <b>${esc(active?.name||'')}</b>${state.groups?.length>1?` · ${esc((state.groups||[]).find(g=>(g.playerIds||[]).includes(active?.id))?.name||'another group')}`:''}.`;
   $('choices').innerHTML=''; if(!state.pending){sc.choices.forEach(choice=>{const [id,label,note]=choice;let available=requirementSatisfied(choice);if(id==='repair'&&Number(player()?.gearUpgrades?.condition??3)>=(player()?.gearUpgrades?.maxCondition||3))available=false;if(id==='roadsteel'&&(player()?.gearUpgrades?.roadsteel||Number(state.coin||0)<4))available=false;const b=document.createElement('button');b.className='choice';b.disabled=!mine||!available;b.innerHTML=`<b>${label}</b><span>${note}${available?'':' · NOT CURRENTLY AVAILABLE'}</span>`;b.onclick=()=>socket.emit('chooseAction',{action:id});$('choices').appendChild(b);});}
+  if(currentLanguage!=='en')setTimeout(translateCurrentStory,0);
   renderChallenge(mine);renderHostTools();renderInventory();renderJourney();$('party').innerHTML=state.players.map(p=>playerCard(p,true)).join('');$('log').innerHTML=state.log.slice().reverse().map(x=>`<div class="log-item">• ${esc(x)}</div>`).join('');renderLastRoll();
 }
 
@@ -633,13 +689,16 @@ function heroEpilogue(p){
 
 function renderVoiceUi(){
   const players=state?.players||[],joined=players.filter(p=>p.voiceJoined);
-  const status=voiceJoined?`${joined.length} connected`:'Not connected';
+  const connectedPeers=[...voiceConnectionStates.values()].filter(x=>x==='connected').length;
+  const status=voiceJoined?`${joined.length} in voice · ${connectedPeers} linked`:'Not connected';
   ['voiceLobbyStatus','voiceGameStatus'].forEach(id=>{const el=$(id);if(el)el.textContent=status;});
   document.querySelectorAll('.voiceJoinBtn').forEach(b=>b.classList.toggle('hidden',voiceJoined));
   document.querySelectorAll('.voiceMuteBtn').forEach(b=>{b.classList.toggle('hidden',!voiceJoined);b.textContent=voiceMuted?'Unmute':'Mute';});
   document.querySelectorAll('.voiceLeaveBtn').forEach(b=>b.classList.toggle('hidden',!voiceJoined));
   const html=joined.length?joined.map(p=>{const speaking=p.id===me?localSpeaking:voiceSpeaking.get(p.id);const icon=p.voiceMuted?'🔇':speaking?'🔊':'🎙';return `<div class="voice-person ${speaking&&!p.voiceMuted?'speaking':''}"><span>${icon}</span><b>${esc(p.name)}</b>${p.id===me?'<em>You</em>':''}</div>`;}).join(''):'<span class="muted">No one has joined voice yet.</span>';
   ['voiceLobbyList','voiceGameList'].forEach(id=>{const el=$(id);if(el)el.innerHTML=html;});
+  const note=voiceRelayAvailable?'TURN relay ready · reliable internet voice enabled':'Direct voice only · add TURN credentials in Render for reliable internet voice';
+  ['voiceLobbyNetwork','voiceGameNetwork'].forEach(id=>{const el=$(id);if(el){el.textContent=note;el.className=`voice-network small ${voiceRelayAvailable?'ok':'warn'}`;}});
 }
 function bindVoiceButtons(){
   document.querySelectorAll('.voiceJoinBtn').forEach(b=>b.onclick=joinVoice);
@@ -647,8 +706,11 @@ function bindVoiceButtons(){
   document.querySelectorAll('.voiceLeaveBtn').forEach(b=>b.onclick=leaveVoice);
 }
 bindVoiceButtons();
+setupLanguageSelector();
+loadVoiceConfig();
 async function joinVoice(){
   if(voiceJoined||!me||!state)return;
+  await loadVoiceConfig();
   if(!navigator.mediaDevices?.getUserMedia)return showConsequence('Voice unavailable','This browser does not provide microphone access.','bad');
   try{
     localVoiceStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});
@@ -663,15 +725,15 @@ function leaveVoice(){
   if(localVoiceStream){localVoiceStream.getTracks().forEach(t=>t.stop());localVoiceStream=null;}
   for(const id of [...voicePeers.keys()])closeVoicePeer(id);renderVoiceUi();
 }
-function closeVoicePeer(id){const pc=voicePeers.get(id);if(pc){try{pc.close();}catch{}voicePeers.delete(id);}const a=document.getElementById(`voice-audio-${id}`);if(a)a.remove();voiceSpeaking.delete(id);}
+function closeVoicePeer(id){const pc=voicePeers.get(id);if(pc){try{pc.close();}catch{}voicePeers.delete(id);}const a=document.getElementById(`voice-audio-${id}`);if(a)a.remove();voiceSpeaking.delete(id);voiceConnectionStates.delete(id);renderVoiceUi();}
 function attachRemoteVoice(id,stream){let a=document.getElementById(`voice-audio-${id}`);if(!a){a=document.createElement('audio');a.id=`voice-audio-${id}`;a.autoplay=true;a.playsInline=true;a.className='remote-voice-audio';document.body.appendChild(a);}a.srcObject=stream;a.play?.().catch(()=>{});}
 async function ensureVoicePeer(id,initiate=false){
   if(!voiceJoined||!localVoiceStream||id===me)return null;if(voicePeers.has(id))return voicePeers.get(id);
-  const pc=new RTCPeerConnection(voiceRtcConfig);pc._queued=[];voicePeers.set(id,pc);
+  const pc=new RTCPeerConnection(voiceRtcConfig);pc._queued=[];voicePeers.set(id,pc);voiceConnectionStates.set(id,'connecting');
   for(const track of localVoiceStream.getTracks())pc.addTrack(track,localVoiceStream);
   pc.onicecandidate=e=>{if(e.candidate)socket.emit('voiceSignal',{targetPlayerId:id,candidate:e.candidate});};
   pc.ontrack=e=>attachRemoteVoice(id,e.streams[0]);
-  pc.onconnectionstatechange=()=>{if(['failed','closed','disconnected'].includes(pc.connectionState)&&pc.connectionState!=='disconnected')closeVoicePeer(id);renderVoiceUi();};
+  pc.onconnectionstatechange=()=>{voiceConnectionStates.set(id,pc.connectionState);renderVoiceUi();if(pc.connectionState==='failed'){showConsequence('Voice connection failed',voiceRelayAvailable?'Retry voice. The relay is configured but this peer did not connect.':'This peer could not connect directly. Add TURN_URL, TURN_USERNAME and TURN_CREDENTIAL in Render for reliable voice.','bad');}if(pc.connectionState==='closed')closeVoicePeer(id);};pc.oniceconnectionstatechange=()=>{if(pc.iceConnectionState==='failed'&&typeof pc.restartIce==='function')try{pc.restartIce();}catch{}};
   if(initiate){try{const offer=await pc.createOffer();await pc.setLocalDescription(offer);socket.emit('voiceSignal',{targetPlayerId:id,description:pc.localDescription});}catch{}}
   return pc;
 }
