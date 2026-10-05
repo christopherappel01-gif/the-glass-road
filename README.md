@@ -1,10 +1,10 @@
 # The Glass Road — The First Crossing
 
-**V1.11.0 — Stability, Accessibility & Story Polish Build**
+**V1.11.1 — Stability, Accessibility & Story Polish Build**
 
 This is the consolidated playtest build after the October 2026 two-player review.
 
-## Main fixes in V1.11.0
+## Main fixes in V1.11.1
 
 - **Language control layout:** the language selector now sits inside the normal game toolbar rather than floating over other controls.
 - **Translation behaviour:** Dutch, French and German now translate the current game screen as one unit. If a full translation is not available, the game keeps that screen in English instead of leaving it half-translated.
@@ -57,7 +57,7 @@ Deploy on Render as a **Web Service**.
 All core visual assets are stored in `public/assets/`.
 
 
-## V1.11.0 translation + hero picker fixes
+## V1.11.1 translation + hero picker fixes
 
 - Hero portrait thumbnails are preloaded and re-rendered as soon as the Create/Join panel becomes visible, preventing blank portrait blocks on first open.
 - Language switching now walks the full visible page rather than translating only a small set of story selectors. Dynamic re-renders are automatically re-translated while a non-English language is active.
@@ -65,10 +65,19 @@ All core visual assets are stored in `public/assets/`.
 - Player-entered names, room codes and PINs are deliberately not translated.
 
 
-## V1.11.0 — Lost Archives & Living Journal
+## V1.11.1 — Lost Archives & Living Journal
 
 - Added four optional **Lost Archive** side stories that appear naturally during the journey. They do not replace the main story choice and can reveal clues, resources, reputation and memorable decisions.
 - Added side-story memories to the persistent campaign save and Journal.
 - Upgraded the Journal with **Story So Far** and **Memory Cards** so important discoveries and optional encounters feel like part of the party's unique version of the First Crossing.
 - Made discovered places on the Journey Map clickable. Selecting a named place now opens a **Journey Memory** view showing what the company learned or chose there.
 - Side stories currently include The Watchtower Without a Door, The Ferryman's Last Lantern, The Missing Page, and The Bell Beneath the Snow.
+
+
+## V1.11.1 language / portrait fixes
+
+- Every fresh page load now starts in **English**, regardless of a previous language choice.
+- The language selector is available immediately on the first landing screen and stays synchronised with the in-game selector.
+- Full-page translation now also covers hidden setup panels, placeholders and select-option labels before they are opened.
+- Class option values stay English internally even when their visible labels are translated, preventing translated class names from breaking portrait/class lookup.
+- Hero portrait choices now use both eager-loaded images and CSS background fallbacks, with a new asset cache version, so the three portraits should be visible immediately instead of only after a click.

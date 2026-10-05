@@ -1,6 +1,6 @@
 {
   "name": "glass-road-first-crossing",
-  "version": "1.11.0",
+  "version": "1.11.1",
   "private": true,
   "description": "GM-less cooperative fantasy RPG: The Glass Road — The First Crossing (V1.11 Lost Archives, living journal and interactive journey memories)",
   "main": "server.js",

@@ -442,3 +442,13 @@ body .scene-art.receiver_threshold,body .scene-art.receiver_assault{min-height:4
 @media(max-width:760px){.lost-archive-card{grid-template-columns:auto 1fr}.lost-archive-card .btn{grid-column:1/-1;width:100%}.memory-card-grid{grid-template-columns:1fr}}
 
 .map-fog,.map-edge{pointer-events:none}.map-place--clickable{pointer-events:all}
+
+
+/* V1.11.1 language-first + portrait loading fixes */
+.home-language-row{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:0 0 10px;padding:0 2px}
+.home-language-row label{margin:0;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.home-language-row select{width:auto;min-width:132px;min-height:40px;margin:0;padding:0 32px 0 10px;border-radius:10px}
+.home-language-row #homeLanguageStatus{max-width:190px;font-size:.70rem}
+.portrait-choice{background-size:cover;background-position:center;background-repeat:no-repeat}
+.portrait-choice img{position:relative;z-index:1;background:transparent}
+@media(max-width:600px){.home-language-row{justify-content:space-between}.home-language-row #homeLanguageStatus{display:none}}

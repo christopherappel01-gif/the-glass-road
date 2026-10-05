@@ -10,6 +10,16 @@
 <body>
 <main id="app">
   <section id="home" class="screen home-screen">
+    <div class="home-language-row" aria-label="Language selector">
+      <label for="homeLanguageSelect">Language</label>
+      <select id="homeLanguageSelect">
+        <option value="en">English</option>
+        <option value="nl">Nederlands</option>
+        <option value="fr">Français</option>
+        <option value="de">Deutsch</option>
+      </select>
+      <span id="homeLanguageStatus" class="small muted"></span>
+    </div>
     <div class="hero-banner hero-banner--opening">
       <video class="hero-banner__video" autoplay muted loop playsinline preload="metadata" poster="assets/hq_landing_hero.webp" aria-hidden="true">
         <source src="assets/hq_landing_hero_slow.webm" type="video/webm">

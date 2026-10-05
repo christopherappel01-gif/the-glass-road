@@ -13,7 +13,7 @@ const classInfo = {
 const sceneLoops={waiting_reunion:"assets/loop_mountain.webp",intro:"assets/loop_discovery.webp",briefing:"assets/loop_discovery.webp",forge:"assets/loop_discovery.webp",cliff_excavation:"assets/loop_discovery.webp",first_mile:"assets/loop_discovery.webp",farmstead:"assets/loop_discovery.webp",woodland_edge:"assets/loop_pines.webp",pine_road:"assets/loop_pines.webp",charcoal_camp:"assets/loop_charcoal.webp",stag_stones:"assets/loop_stag.webp",pine_camp:"assets/loop_charcoal.webp",pine_descent:"assets/loop_pines.webp",river_road:"assets/loop_river.webp",ferry_house:"assets/loop_river.webp",drowned_marker:"assets/loop_lowwater.webp",river_hamlet:"assets/loop_lowwater.webp",river_camp:"assets/loop_lowwater.webp",river_exit:"assets/loop_lowwater.webp",broken_span:"assets/loop_broken_span.webp",span_wave1:"assets/loop_broken_span.webp",span_choice:"assets/loop_tone_bridge.webp",span_final:"assets/loop_tone_bridge.webp",after_span:"assets/loop_tone_bridge.webp",hollowmere:"assets/loop_hollowmere.webp",hollow_forge:"assets/loop_under_mountain.webp",hollow_inn:"assets/loop_hollowmere.webp",hollow_records:"assets/loop_hollowmere.webp",mountain_departure:"assets/loop_mountain.webp",ridge1:"assets/loop_mountain.webp",ridge2:"assets/loop_mountain.webp",ridge3:"assets/loop_mountain.webp",tunnel1:"assets/loop_under_mountain.webp",tunnel2:"assets/loop_under_mountain.webp",tunnel3:"assets/loop_under_mountain.webp",pass_reunion:"assets/loop_mountain.webp",final_view:"assets/loop_final.webp",receiver_threshold:"assets/loop_under_mountain.webp",receiver_assault:"assets/loop_under_mountain.webp",keeper_choice:"assets/loop_under_mountain.webp"};
 const sceneArt={waiting_reunion:["","Waiting at the Rendezvous"],"intro":["","Brackencliff After the Quake"],"briefing":["","The Expedition Table"],"forge":["","The Forge Before the Road"],"cliff_excavation":["","The First Exposed Mile"],"first_mile":["","The Road Under the Fields"],"farmstead":["","The Last Farm"],"woodland_edge":["","Where the Old Maps End"],"pine_road":["","Under the High Pines"],"charcoal_camp":["","The Charcoal Burner's Camp"],"stag_stones":["","The Stag Stones"],"pine_camp":["","Camp Above the Tern"],"pine_descent":["","The Long Descent"],"river_road":["","Along the River Tern"],"ferry_house":["","The Empty Ferry House"],"drowned_marker":["","The Drowned Marker"],"river_hamlet":["","Three Houses at Lowwater"],"river_camp":["","Rain at Lowwater"],"river_exit":["","The Flooded Approach"],"broken_span":["","The Broken Bridge"],"span_wave1":["","Glass Hounds"],"span_choice":["","The Bridge Wakes"],"span_final":["","The Sound Beneath the Bridge"],"after_span":["","Two Expeditions, One Road"],"hollowmere":["","Hollowmere"],"hollow_forge":["","The Mountain Forge"],"hollow_inn":["","The Lantern Inn"],"hollow_records":["","The Toll-House Archive"],"mountain_departure":["","Leaving Hollowmere"],"ridge1":["","The Wind Stair"],"ridge2":["","The Bell Cairn"],"ridge3":["","The White Ledge"],"tunnel1":["","The Sealed Door"],"tunnel2":["","The Water Chambers"],"tunnel3":["","The Closed Chamber"],"pass_reunion":["","The First Crossing"],"final_view":["","Beyond the Known Maps"]};
 const sceneImages={waiting_reunion:"assets/hq_mountain_pass.webp","intro":"assets/brackencliff_v12.webp","briefing":"assets/scene_briefing.webp","forge":"assets/scene_forge.webp","cliff_excavation":"assets/scene_cliff_excavation.webp","first_mile":"assets/first_mile_ai.webp","farmstead":"assets/scene_farmstead.webp","woodland_edge":"assets/hq_greywood_road.webp","pine_road":"assets/hq_greywood_road.webp","charcoal_camp":"assets/hq_charcoal_camp.webp","stag_stones":"assets/hq_stag_stones.webp","pine_camp":"assets/hq_pine_camp.webp","pine_descent":"assets/hq_pine_camp.webp","river_road":"assets/hq_river_road.webp","ferry_house":"assets/hq_river_road.webp","drowned_marker":"assets/hq_lowwater.webp","river_hamlet":"assets/hq_lowwater.webp","river_camp":"assets/hq_lowwater.webp","river_exit":"assets/hq_lowwater.webp","broken_span":"assets/hq_broken_span_hounds.webp","span_wave1":"assets/hq_broken_span_hounds.webp","span_choice":"assets/hq_tone_beneath_bridge.webp","span_final":"assets/hq_tone_beneath_bridge.webp","after_span":"assets/hq_tone_beneath_bridge.webp","hollowmere":"assets/hollowmere_ai.webp","hollow_forge":"assets/hq_under_mountain.webp","hollow_inn":"assets/hollowmere_ai.webp","hollow_records":"assets/hollowmere_ai.webp","mountain_departure":"assets/hq_mountain_pass.webp","ridge1":"assets/hq_mountain_pass.webp","ridge2":"assets/hq_mountain_pass.webp","ridge3":"assets/hq_mountain_pass.webp","tunnel1":"assets/hq_under_mountain.webp","tunnel2":"assets/hq_under_mountain.webp","tunnel3":"assets/hq_under_mountain.webp","pass_reunion":"assets/hq_mountain_pass.webp","final_view":"assets/final_ai.webp"};
-const HERO_ASSET_VERSION='v160';
+const HERO_ASSET_VERSION='v1111';
 const heroAsset=(file)=>`/assets/${file}?${HERO_ASSET_VERSION}`;
 const portraitImages={Knight:['knight_1.webp','knight_2.webp','knight_3.webp'],Ranger:['ranger_1.webp','ranger_2.webp','ranger_3.webp'],Thief:['thief_1.webp','thief_2.webp','thief_3.webp'],Mage:['mage_1.webp','mage_2.webp','mage_3.webp'],Monk:['monk_1.webp','monk_2.webp','monk_3.webp'],Engineer:['engineer_1.webp','engineer_2.webp','engineer_3.webp']};
 const portraitFallbacks={Knight:'knight_1.webp',Ranger:'ranger_1.webp',Thief:'thief_1.webp',Mage:'mage_1.webp',Monk:'monk_1.webp',Engineer:'engineer_1.webp'};
@@ -75,7 +75,7 @@ function writeJson(key,value){try{localStorage.setItem(key,JSON.stringify(value)
 function clearKey(key){try{localStorage.removeItem(key)}catch{}}
 
 const languageNames={en:'English',nl:'Nederlands',fr:'Français',de:'Deutsch'};
-let currentLanguage=readJson('glassRoadLanguage')||'en';
+let currentLanguage='en';
 let translationToken=0,translatorInstance=null,translatorLang='';
 const translationCache=new Map();
 let translationServerAvailable=false;
@@ -127,7 +127,7 @@ async function loadTranslationConfig(){try{const r=await fetch('/translation-con
 async function loadVoiceConfig(){
   try{const r=await fetch('/voice-config',{cache:'no-store'});if(!r.ok)return;const cfg=await r.json();if(Array.isArray(cfg.iceServers)&&cfg.iceServers.length)voiceRtcConfig={iceServers:cfg.iceServers,iceCandidatePoolSize:4};voiceRelayAvailable=!!cfg.relayAvailable;renderVoiceUi();}catch{}
 }
-function setLanguageStatus(msg=''){const el=$('languageStatus');if(el)el.textContent=msg;}
+function setLanguageStatus(msg=''){for(const id of ['languageStatus','homeLanguageStatus']){const el=$(id);if(el)el.textContent=msg;}}
 async function getBrowserTranslator(target){
   if(target==='en')return null;
   try{const T=window.Translator;if(!T?.create)return null;if(translatorInstance&&translatorLang===target)return translatorInstance;if(T.availability){const a=await T.availability({sourceLanguage:'en',targetLanguage:target});if(a==='unavailable')return null;}translatorInstance=await T.create({sourceLanguage:'en',targetLanguage:target,monitor(m){m.addEventListener?.('downloadprogress',e=>setLanguageStatus(`Downloading ${Math.round((e.loaded||0)*100)}%`));}});translatorLang=target;return translatorInstance;}catch{return null;}
@@ -176,31 +176,59 @@ let fullTranslationTimer=null,translationApplying=false,translationObserver=null
 function shouldTranslateTextNode(node){
   const p=node?.parentElement;if(!p)return false;const tag=p.tagName;
   if(['SCRIPT','STYLE','NOSCRIPT','TEXTAREA'].includes(tag))return false;
-  if(p.closest('[data-no-translate],#languageSelect,.player-ident b,.voice-person b,.room-code-big,.return-pin,.code-input,.journey-map svg'))return false;
+  if(p.closest('[data-no-translate],#languageSelect,#homeLanguageSelect,.player-ident b,.voice-person b,.room-code-big,.return-pin,.code-input,.journey-map svg'))return false;
   const s=String(node.nodeValue||'');return /[A-Za-zÀ-ÿ]/.test(s)&&s.trim().length>1;
 }
 function visibleTextNodes(root=document.body){
   const out=[];const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>shouldTranslateTextNode(n)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT});
-  let n;while((n=walker.nextNode())){const p=n.parentElement;if(!p)continue;const cs=getComputedStyle(p);if(cs.display==='none'||cs.visibility==='hidden')continue;out.push(n);}return out;
+  let n;while((n=walker.nextNode()))out.push(n);return out;
 }
 function sourceForNode(node){let meta=translationNodeMeta.get(node);if(!meta){const raw=String(node.nodeValue||''),m=raw.match(/^(\s*)([\s\S]*?)(\s*)$/);meta={leading:m?.[1]||'',source:m?.[2]||raw,trailing:m?.[3]||''};translationNodeMeta.set(node,meta);}return meta;}
-function restoreEnglishPage(){translationApplying=true;try{visibleTextNodes(document.body).forEach(n=>{const m=translationNodeMeta.get(n);if(m)n.nodeValue=m.leading+m.source+m.trailing;});resetStaticUiToEnglish();}finally{translationApplying=false;}}
+function restoreEnglishFormControls(){
+  document.querySelectorAll('input[placeholder],textarea[placeholder]').forEach(el=>{if(el.dataset.translatePlaceholderSource)el.placeholder=el.dataset.translatePlaceholderSource;});
+  document.querySelectorAll('select option').forEach(opt=>{if(opt.closest('#languageSelect,#homeLanguageSelect'))return;if(opt.dataset.translateOptionSource)opt.textContent=opt.dataset.translateOptionSource;});
+}
+async function translateFormControls(lang){
+  if(lang==='en'){restoreEnglishFormControls();return 0;}
+  let failed=0;
+  for(const el of document.querySelectorAll('input[placeholder],textarea[placeholder]')){
+    if(!el.dataset.translatePlaceholderSource)el.dataset.translatePlaceholderSource=el.placeholder||'';
+    const src=el.dataset.translatePlaceholderSource;if(!src)continue;const out=await translateText(src,lang);if(out)el.placeholder=out;else failed++;
+  }
+  for(const opt of document.querySelectorAll('select option')){
+    if(opt.closest('#languageSelect,#homeLanguageSelect'))continue;
+    if(!opt.dataset.translateOptionSource)opt.dataset.translateOptionSource=opt.textContent.trim();
+    const src=opt.dataset.translateOptionSource;if(!src)continue;const out=await translateText(src,lang);if(out)opt.textContent=out;else failed++;
+  }
+  return failed;
+}
+function restoreEnglishPage(){translationApplying=true;try{visibleTextNodes(document.body).forEach(n=>{const m=translationNodeMeta.get(n);if(m)n.nodeValue=m.leading+m.source+m.trailing;});resetStaticUiToEnglish();restoreEnglishFormControls();}finally{translationApplying=false;}}
 async function translateVisiblePage(){
-  const token=++translationToken,lang=currentLanguage,sel=$('languageSelect');
+  const token=++translationToken,lang=currentLanguage,sels=[$('languageSelect'),$('homeLanguageSelect')].filter(Boolean);
   if(lang==='en'){restoreEnglishPage();setLanguageStatus('');return true;}
-  if(sel)sel.disabled=true;setLanguageStatus('Translating whole page…');
+  sels.forEach(s=>s.disabled=true);setLanguageStatus('Translating whole page…');
   const nodes=visibleTextNodes(document.body);const jobs=[];
   for(const node of nodes){const m=sourceForNode(node),src=m.source.trim();if(!src)continue;jobs.push({node,meta:m,src});}
   let failed=0,next=0;
   async function worker(){while(next<jobs.length){const j=jobs[next++];const translated=await translateText(j.src,lang);if(token!==translationToken||currentLanguage!==lang)return;if(translated){translationApplying=true;j.node.nodeValue=j.meta.leading+translated+j.meta.trailing;translationApplying=false;}else failed++;}}
   await Promise.all(Array.from({length:Math.min(5,jobs.length||1)},()=>worker()));
-  if(token!==translationToken||currentLanguage!==lang){if(sel)sel.disabled=false;return false;}
-  applyStaticUiLanguage(lang);if(sel)sel.disabled=false;
+  if(token!==translationToken||currentLanguage!==lang){sels.forEach(s=>s.disabled=false);return false;}
+  failed+=await translateFormControls(lang);
+  applyStaticUiLanguage(lang);sels.forEach(s=>s.disabled=false);
   setLanguageStatus(failed?`${languageNames[lang]} · ${failed} items left in English`:`${languageNames[lang]} · translated`);return failed===0;
 }
 function scheduleFullPageTranslation(delay=80){clearTimeout(fullTranslationTimer);if(currentLanguage==='en')return;fullTranslationTimer=setTimeout(()=>translateVisiblePage(),delay);}
 function setupTranslationObserver(){if(translationObserver)return;translationObserver=new MutationObserver(muts=>{if(translationApplying||currentLanguage==='en')return;if(muts.some(m=>m.type==='childList'||m.type==='characterData'))scheduleFullPageTranslation(140);});translationObserver.observe(document.body,{subtree:true,childList:true,characterData:true});}
-function setupLanguageSelector(){const sel=$('languageSelect');if(!sel)return;sel.value=currentLanguage;sel.onchange=async()=>{currentLanguage=sel.value;writeJson('glassRoadLanguage',currentLanguage);translatorInstance=null;translatorLang='';translationToken++;if(currentLanguage==='en'){if(state?.phase==='playing'){lastRenderedScene=null;renderGame();}restoreEnglishPage();setLanguageStatus('');return;}if(state?.phase==='playing'){lastRenderedScene=null;renderGame();}applyStaticUiLanguage(currentLanguage);await translateVisiblePage();};applyStaticUiLanguage(currentLanguage);setupTranslationObserver();if(currentLanguage!=='en')setTimeout(()=>translateVisiblePage(),120);}
+function setupLanguageSelector(){
+  const sels=[$('languageSelect'),$('homeLanguageSelect')].filter(Boolean);if(!sels.length)return;
+  currentLanguage='en';clearKey('glassRoadLanguage');sels.forEach(s=>s.value='en');restoreEnglishPage();applyStaticUiLanguage('en');setLanguageStatus('');
+  const changeLanguage=async(lang)=>{currentLanguage=lang;sels.forEach(s=>s.value=lang);translatorInstance=null;translatorLang='';translationToken++;
+    if(currentLanguage==='en'){if(state?.phase==='playing'){lastRenderedScene=null;renderGame();}restoreEnglishPage();setLanguageStatus('');return;}
+    if(state?.phase==='playing'){lastRenderedScene=null;renderGame();}
+    applyStaticUiLanguage(currentLanguage);await translateVisiblePage();
+  };
+  sels.forEach(s=>s.onchange=()=>changeLanguage(s.value));setupTranslationObserver();
+}
 function clueStorageKey(code=roomCode,id=me){return code&&id?`glassRoadClues_${code}_${id}`:null}
 function loadPrivateClues(code=roomCode,id=me){const key=clueStorageKey(code,id);privateClues=key?(readJson(key)||[]):[];return privateClues}
 function savePrivateClues(){const key=clueStorageKey();if(key)writeJson(key,privateClues)}
@@ -294,9 +322,9 @@ function openHomeFlow(mode='create'){
 function closeHomeFlow(){ $('homeFlow')?.classList.add('hidden'); }
 function copyText(text,button,label='Copied!'){if(!text)return;const done=()=>{if(button){const old=button.textContent;button.textContent=label;setTimeout(()=>button.textContent=old,1600);}};if(navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(done).catch(()=>{prompt('Copy this backup key:',text)});else prompt('Copy this backup key:',text);}
 function preloadHeroPortraits(){for(const cls of classes){for(const file of (portraitImages[cls]||[])){const img=new Image();img.decoding='async';img.src=heroAsset(file);}}}
-function renderPortraitPicker(mode){const cls=$(mode+'Class').value,box=$(mode+'Portraits');if(!box)return;box.innerHTML=portraitImages[cls].map((src,i)=>`<button type="button" class="portrait-choice ${portraitChoice[mode]===i+1?'selected':''}" data-p="${i+1}"><img src="${heroAsset(src)}" onerror="${portraitError(cls)}" alt="${cls} portrait ${i+1}"></button>`).join('');box.querySelectorAll('.portrait-choice').forEach(b=>b.onclick=()=>{portraitChoice[mode]=Number(b.dataset.p);renderPortraitPicker(mode);renderClassPreview(mode+'Class',mode+'ClassInfo',mode);});}
+function renderPortraitPicker(mode){const cls=$(mode+'Class').value,box=$(mode+'Portraits');if(!box||!portraitImages[cls])return;box.innerHTML=portraitImages[cls].map((src,i)=>{const url=heroAsset(src);return `<button type="button" class="portrait-choice ${portraitChoice[mode]===i+1?'selected':''}" data-p="${i+1}" style="background-image:url('${url}')"><img src="${url}" loading="eager" decoding="async" onerror="${portraitError(cls)}" alt="${cls} portrait ${i+1}"></button>`;}).join('');box.querySelectorAll('.portrait-choice').forEach(b=>b.onclick=()=>{portraitChoice[mode]=Number(b.dataset.p);renderPortraitPicker(mode);renderClassPreview(mode+'Class',mode+'ClassInfo',mode);});requestAnimationFrame(()=>box.querySelectorAll('img').forEach(img=>{if(!img.complete){const src=img.src;img.src='';img.src=src;}img.decode?.().catch(()=>{});}));}
 function renderClassPreview(selectId,boxId,mode=selectId.startsWith('create')?'create':'join'){const c=$(selectId).value,i=classInfo[c];$(boxId).innerHTML=`<div class="class-portrait-frame"><img class="class-portrait" src="${portraitPath(c,portraitChoice[mode])}" onerror="${portraitError(c)}" alt="${c} portrait"></div><div><strong>${i.icon} ${c}</strong><br>${i.gift}</div>`;}
-['createClass','joinClass'].forEach(id=>{$(id).innerHTML=classes.map(c=>`<option>${c}</option>`).join('');$(id).addEventListener('change',()=>{const mode=id.startsWith('create')?'create':'join';portraitChoice[mode]=1;renderClassPreview(id,id==='createClass'?'createClassInfo':'joinClassInfo',mode);renderPortraitPicker(mode);});});
+['createClass','joinClass'].forEach(id=>{$(id).innerHTML=classes.map(c=>`<option value="${c}">${c}</option>`).join('');$(id).addEventListener('change',()=>{const mode=id.startsWith('create')?'create':'join';portraitChoice[mode]=1;renderClassPreview(id,id==='createClass'?'createClassInfo':'joinClassInfo',mode);renderPortraitPicker(mode);});});
 preloadHeroPortraits();renderClassPreview('createClass','createClassInfo','create');renderClassPreview('joinClass','joinClassInfo','join');renderPortraitPicker('create');renderPortraitPicker('join');
 ['createBackground','joinBackground'].forEach(id=>{if(!$(id))return;$(id).innerHTML=Object.entries(backgrounds).map(([k,v])=>`<option value="${k}">${k} — ${v.edge}</option>`).join('');});
 
